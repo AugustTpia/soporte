@@ -69,6 +69,17 @@ final class EloquentUserRepository implements UserRepository
         return $model ? $this->mapper->toDomain($model) : null;
     }
 
+    public function forCompany(int $companyId): array
+    {
+        return UserModel::query()
+            ->with(['company', 'roles', 'departments'])
+            ->where('company_id', $companyId)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (UserModel $model) => $this->mapper->toDomain($model))
+            ->all();
+    }
+
     public function save(UserEntity $user, ?string $plainPassword = null): UserEntity
     {
         $isNew = $user->id === null;

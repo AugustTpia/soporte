@@ -14,6 +14,11 @@ interface LocationRepository
 
     public function find(int $id, int $companyId): ?Location;
 
+    /**
+     * @return array<int, Location>
+     */
+    public function forCompany(int $companyId): array;
+
     public function save(Location $location): Location;
 
     public function slugExists(int $companyId, string $slug, ?int $ignoreId = null): bool;

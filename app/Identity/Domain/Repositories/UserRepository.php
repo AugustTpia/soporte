@@ -23,6 +23,11 @@ interface UserRepository
 
     public function find(int $id): ?User;
 
+    /**
+     * @return array<int, User>
+     */
+    public function forCompany(int $companyId): array;
+
     public function findByEmail(string $email): ?User;
 
     public function save(User $user, ?string $plainPassword = null): User;

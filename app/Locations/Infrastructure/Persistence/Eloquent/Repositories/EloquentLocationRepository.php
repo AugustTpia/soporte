@@ -50,6 +50,16 @@ final class EloquentLocationRepository implements LocationRepository
         return $model ? $this->mapper->toDomain($model) : null;
     }
 
+    public function forCompany(int $companyId): array
+    {
+        return LocationModel::query()
+            ->where('company_id', $companyId)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (LocationModel $model) => $this->mapper->toDomain($model))
+            ->all();
+    }
+
     public function save(Location $location): Location
     {
         $model = $location->id === null

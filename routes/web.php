@@ -1,5 +1,7 @@
 <?php
 
+use App\Assets\Presentation\Livewire\AssetForm;
+use App\Assets\Presentation\Livewire\AssetIndex;
 use App\Auditing\Presentation\Livewire\AuditIndex;
 use App\Companies\Presentation\Livewire\Companies\CompanyForm;
 use App\Companies\Presentation\Livewire\Companies\CompanyIndex;
@@ -32,6 +34,10 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('locations', LocationIndex::class)->name('locations.index');
     Route::get('locations/create', LocationForm::class)->name('locations.create');
     Route::get('locations/{location}/edit', LocationForm::class)->name('locations.edit');
+
+    Route::get('assets', AssetIndex::class)->name('assets.index');
+    Route::get('assets/create', AssetForm::class)->name('assets.create');
+    Route::get('assets/{asset}/edit', AssetForm::class)->name('assets.edit');
 
     Route::get('users', UserIndex::class)->name('users.index');
     Route::get('users/create', UserForm::class)->name('users.create');

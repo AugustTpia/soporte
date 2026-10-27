@@ -33,6 +33,14 @@
                 @endif
 
                 @if($activeCompanyId !== null)
+                    @can('viewAny', \App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel::class)
+                        <flux:sidebar.group heading="Operación" class="grid">
+                            <flux:sidebar.item icon="computer-desktop" :href="route('assets.index')" :current="request()->routeIs('assets.*')" wire:navigate>
+                                Activos
+                            </flux:sidebar.item>
+                        </flux:sidebar.group>
+                    @endcan
+
                     @if(auth()->user()->can('departments.view') || auth()->user()->can('locations.view') || auth()->user()->can('users.view') || auth()->user()->can('audit.view'))
                         <flux:sidebar.group heading="Administración" class="grid">
                             @can('viewAny', \App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel::class)
