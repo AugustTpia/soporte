@@ -16,18 +16,26 @@ use App\Companies\Domain\Repositories\CompanyRepository;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
 use App\Companies\Infrastructure\Persistence\Eloquent\Repositories\EloquentCompanyRepository;
 use App\Companies\Presentation\Livewire\Companies\CompanySwitcher;
+use App\Credentials\Application\Contracts\CredentialCipher;
+use App\Credentials\Domain\Repositories\CredentialRepository;
+use App\Credentials\Infrastructure\Encryption\LaravelCredentialCipher;
+use App\Credentials\Infrastructure\Persistence\Eloquent\Models\CredentialModel;
+use App\Credentials\Infrastructure\Persistence\Eloquent\Repositories\EloquentCredentialRepository;
 use App\Departments\Domain\Repositories\DepartmentRepository;
 use App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel;
 use App\Departments\Infrastructure\Persistence\Eloquent\Repositories\EloquentDepartmentRepository;
+use App\Identity\Application\Contracts\PasswordVerifier;
 use App\Identity\Domain\Repositories\UserRepository;
 use App\Identity\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use App\Identity\Infrastructure\Persistence\Eloquent\User;
+use App\Identity\Infrastructure\Security\LaravelPasswordVerifier;
 use App\Locations\Domain\Repositories\LocationRepository;
 use App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel;
 use App\Locations\Infrastructure\Persistence\Eloquent\Repositories\EloquentLocationRepository;
 use App\Policies\AssetPolicy;
 use App\Policies\AuditLogPolicy;
 use App\Policies\CompanyPolicy;
+use App\Policies\CredentialPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\ServiceAccountPolicy;
@@ -40,10 +48,13 @@ use App\Shared\Infrastructure\Persistence\LaravelTransactionManager;
 use App\Shared\Infrastructure\Tenancy\SessionTenantContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Livewire;
@@ -60,6 +71,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransactionManager::class, LaravelTransactionManager::class);
 
         $this->app->bind(ServiceAccountRepository::class, EloquentServiceAccountRepository::class);
+        $this->app->bind(CredentialRepository::class, EloquentCredentialRepository::class);
+        $this->app->singleton(CredentialCipher::class, fn () => new LaravelCredentialCipher(
+            currentKey: config('credentials.current_key'),
+            previousKeys: config('credentials.previous_keys', []),
+        ));
+        $this->app->bind(PasswordVerifier::class, LaravelPasswordVerifier::class);
         $this->app->bind(AssetRepository::class, EloquentAssetRepository::class);
         $this->app->bind(CompanyRepository::class, EloquentCompanyRepository::class);
         $this->app->bind(DepartmentRepository::class, EloquentDepartmentRepository::class);
@@ -77,6 +94,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureAuthorization();
         $this->configureEvents();
         $this->configureLivewire();
+        $this->configureRateLimiting();
     }
 
     /**
@@ -113,6 +131,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LocationModel::class, LocationPolicy::class);
         Gate::policy(AssetModel::class, AssetPolicy::class);
         Gate::policy(ServiceAccountModel::class, ServiceAccountPolicy::class);
+        Gate::policy(CredentialModel::class, CredentialPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }
 
@@ -123,6 +142,12 @@ class AppServiceProvider extends ServiceProvider
                 $event->user->forceFill(['last_login_at' => now()])->saveQuietly();
             }
         });
+    }
+
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('credentials', fn (Request $request) => Limit::perMinute(6)
+            ->by($request->user()?->id ?: $request->ip()));
     }
 
     protected function configureLivewire(): void

@@ -33,7 +33,7 @@
                 @endif
 
                 @if($activeCompanyId !== null)
-                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view'))
+                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view') || auth()->user()->can('credentials.view'))
                         <flux:sidebar.group heading="Operación" class="grid">
                             @can('viewAny', \App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel::class)
                                 <flux:sidebar.item icon="computer-desktop" :href="route('assets.index')" :current="request()->routeIs('assets.*')" wire:navigate>
@@ -43,6 +43,11 @@
                             @can('viewAny', \App\Accounts\Infrastructure\Persistence\Eloquent\Models\ServiceAccountModel::class)
                                 <flux:sidebar.item icon="key" :href="route('accounts.index')" :current="request()->routeIs('accounts.*')" wire:navigate>
                                     Cuentas
+                                </flux:sidebar.item>
+                            @endcan
+                            @can('viewAny', \App\Credentials\Infrastructure\Persistence\Eloquent\Models\CredentialModel::class)
+                                <flux:sidebar.item icon="lock-closed" :href="route('credentials.index')" :current="request()->routeIs('credentials.*')" wire:navigate>
+                                    Credenciales
                                 </flux:sidebar.item>
                             @endcan
                         </flux:sidebar.group>

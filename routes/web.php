@@ -7,6 +7,10 @@ use App\Assets\Presentation\Livewire\AssetIndex;
 use App\Auditing\Presentation\Livewire\AuditIndex;
 use App\Companies\Presentation\Livewire\Companies\CompanyForm;
 use App\Companies\Presentation\Livewire\Companies\CompanyIndex;
+use App\Credentials\Presentation\Http\Controllers\CredentialRevealController;
+use App\Credentials\Presentation\Http\Controllers\CredentialSecretController;
+use App\Credentials\Presentation\Livewire\CredentialForm;
+use App\Credentials\Presentation\Livewire\CredentialIndex;
 use App\Departments\Presentation\Livewire\DepartmentForm;
 use App\Departments\Presentation\Livewire\DepartmentIndex;
 use App\Identity\Presentation\Livewire\Users\UserForm;
@@ -44,6 +48,16 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('accounts', ServiceAccountIndex::class)->name('accounts.index');
     Route::get('accounts/create', ServiceAccountForm::class)->name('accounts.create');
     Route::get('accounts/{account}/edit', ServiceAccountForm::class)->name('accounts.edit');
+
+    Route::get('credentials', CredentialIndex::class)->name('credentials.index');
+    Route::get('credentials/create', CredentialForm::class)->name('credentials.create');
+    Route::get('credentials/{credential}/edit', CredentialForm::class)->name('credentials.edit');
+    Route::post('credentials/{credential}/secret', [CredentialSecretController::class, 'store'])
+        ->middleware('throttle:credentials')
+        ->name('credentials.secret.store');
+    Route::post('credentials/{credential}/reveal', [CredentialRevealController::class, 'store'])
+        ->middleware('throttle:credentials')
+        ->name('credentials.reveal');
 
     Route::get('users', UserIndex::class)->name('users.index');
     Route::get('users/create', UserForm::class)->name('users.create');

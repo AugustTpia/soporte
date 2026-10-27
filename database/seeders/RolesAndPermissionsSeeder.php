@@ -29,6 +29,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'assets.manage',
             'accounts.view',
             'accounts.manage',
+            'credentials.view',
+            'credentials.manage',
+            'credentials.reveal',
             'audit.view',
         ];
 
@@ -54,6 +57,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.manage',
                 'accounts.view',
                 'accounts.manage',
+                'credentials.view',
+                'credentials.manage',
+                'credentials.reveal',
                 'audit.view',
             ],
             RoleName::ServiceManager->value => [
@@ -65,6 +71,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.manage',
                 'accounts.view',
                 'accounts.manage',
+                'credentials.view',
+                'credentials.manage',
+                'credentials.reveal',
                 'audit.view',
             ],
             RoleName::Engineer->value => [
@@ -73,6 +82,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.manage',
                 'accounts.view',
                 'accounts.manage',
+                'credentials.view',
             ],
             RoleName::Technician->value => [
                 'locations.view',
@@ -80,6 +90,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.manage',
                 'accounts.view',
                 'accounts.manage',
+                'credentials.view',
             ],
             RoleName::Auditor->value => [
                 'users.view',
@@ -87,6 +98,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'locations.view',
                 'assets.view',
                 'accounts.view',
+                'credentials.view',
                 'audit.view',
             ],
             RoleName::ReadOnly->value => [
@@ -95,6 +107,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'locations.view',
                 'assets.view',
                 'accounts.view',
+                'credentials.view',
             ],
         ];
 

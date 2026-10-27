@@ -11,6 +11,34 @@
                 {{ $companyName ? 'Cuentas de servicio de '.$companyName.'.' : 'Registra una cuenta de servicio.' }}
             </p>
         </div>
+
+        @if($isEditing && $account)
+            <div class="flex flex-wrap items-center gap-2">
+                @can('viewAny', \App\Credentials\Infrastructure\Persistence\Eloquent\Models\CredentialModel::class)
+                    <flux:button
+                        size="sm"
+                        variant="subtle"
+                        icon="lock-closed"
+                        :href="route('credentials.index', ['account' => $account->id])"
+                        wire:navigate
+                    >
+                        Credenciales de esta cuenta
+                    </flux:button>
+                @endcan
+
+                @can('create', \App\Credentials\Infrastructure\Persistence\Eloquent\Models\CredentialModel::class)
+                    <flux:button
+                        size="sm"
+                        variant="primary"
+                        icon="plus"
+                        :href="route('credentials.create', ['account' => $account->id])"
+                        wire:navigate
+                    >
+                        Nueva credencial
+                    </flux:button>
+                @endcan
+            </div>
+        @endif
     </div>
 
     @if($errors->any())

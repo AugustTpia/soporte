@@ -3,6 +3,7 @@
 namespace App\Accounts\Infrastructure\Persistence\Eloquent\Models;
 
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
+use App\Credentials\Infrastructure\Persistence\Eloquent\Models\CredentialModel;
 use App\Identity\Infrastructure\Persistence\Eloquent\User;
 use Database\Factories\ServiceAccountFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read User|null $responsibleUser
  * @property-read User|null $creator
  * @property-read Collection<int, ServiceAccountAssetLinkModel> $links
+ * @property-read Collection<int, CredentialModel> $credentials
  */
 class ServiceAccountModel extends Model
 {
@@ -83,5 +85,14 @@ class ServiceAccountModel extends Model
     {
         return $this->hasMany(ServiceAccountAssetLinkModel::class, 'service_account_id')
             ->orderByDesc('linked_at');
+    }
+
+    /**
+     * @return HasMany<CredentialModel, $this>
+     */
+    public function credentials(): HasMany
+    {
+        return $this->hasMany(CredentialModel::class, 'service_account_id')
+            ->orderBy('label');
     }
 }
