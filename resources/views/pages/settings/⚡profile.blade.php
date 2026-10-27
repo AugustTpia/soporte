@@ -1,39 +1,55 @@
 <?php
 
+use App\Companies\Domain\Repositories\CompanyRepository;
 use App\Concerns\ProfileValidationRules;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Shared\Application\Contracts\TenantContext;
 use Flux\Flux;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Profile settings')] class extends Component {
+new #[Title('Perfil')] class extends Component {
     use ProfileValidationRules;
 
     public string $name = '';
     public string $email = '';
+    public string $jobTitle = '';
+    public string $phone = '';
+    public ?string $companyName = null;
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->jobTitle = Auth::user()->job_title ?? '';
+        $this->phone = Auth::user()->phone ?? '';
+
+        $companyId = app(TenantContext::class)->companyId();
+
+        $this->companyName = $companyId === null
+            ? null
+            : app(CompanyRepository::class)->find($companyId)?->name;
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
 
-        $validated = $this->validate($this->profileRules($user->id));
+        $validated = $this->validate([
+            ...$this->profileRules($user->id),
+            'jobTitle' => ['nullable', 'string', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
 
-        $user->fill($validated);
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'job_title' => $validated['jobTitle'] !== '' ? $validated['jobTitle'] : null,
+            'phone' => $validated['phone'] !== '' ? $validated['phone'] : null,
+        ]);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -41,12 +57,9 @@ new #[Title('Profile settings')] class extends Component {
 
         $user->save();
 
-        Flux::toast(variant: 'success', text: __('Profile updated.'));
+        Flux::toast(variant: 'success', text: 'Perfil actualizado.');
     }
 
-    /**
-     * Send an email verification notification to the current user.
-     */
     public function resendVerificationNotification(): void
     {
         $user = Auth::user();
@@ -67,58 +80,58 @@ new #[Title('Profile settings')] class extends Component {
     {
         return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
     }
-
-    #[Computed]
-    public function showDeleteUser(): bool
-    {
-        return ! Auth::user() instanceof MustVerifyEmail
-            || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
-    }
 }; ?>
 
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <flux:heading level="2" class="sr-only">{{ __('Profile settings') }}</flux:heading>
+    <flux:heading level="2" class="sr-only">Perfil</flux:heading>
 
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+    <x-pages::settings.layout heading="Perfil" subheading="Actualiza tus datos personales y de contacto">
+        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-5">
+            <flux:input wire:model="name" label="Nombre completo" type="text" required autofocus autocomplete="name" />
 
-            <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+            <flux:input wire:model="email" label="Correo electrónico" type="email" required autocomplete="email" />
 
-                @if ($this->hasUnverifiedEmail)
-                    <div>
-                        <flux:text class="mt-4">
-                            {{ __('Your email address is unverified.') }}
+            @if ($this->hasUnverifiedEmail)
+                <div class="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3">
+                    <flux:text class="text-amber-800 dark:text-amber-300">
+                        Tu correo electrónico no está verificado.
 
-                            <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
-                                {{ __('Click here to re-send the verification email.') }}
-                            </flux:link>
+                        <flux:link class="cursor-pointer text-sm" wire:click.prevent="resendVerificationNotification">
+                            Reenviar correo de verificación
+                        </flux:link>
+                    </flux:text>
+
+                    @if (session('status') === 'verification-link-sent')
+                        <flux:text class="mt-2 font-medium text-emerald-700 dark:text-emerald-300">
+                            Se envió un nuevo enlace de verificación a tu correo.
                         </flux:text>
+                    @endif
+                </div>
+            @endif
 
-                        @if (session('status') === 'verification-link-sent')
-                            <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
-                                {{ __('A new verification link has been sent to your email address.') }}
-                            </flux:text>
-                        @endif
-                    </div>
-                @endif
+            <div class="grid gap-5 sm:grid-cols-2">
+                <flux:input wire:model="jobTitle" label="Puesto" type="text" autocomplete="organization-title" placeholder="Ej. Técnico de soporte" />
+
+                <flux:input wire:model="phone" label="Teléfono" type="tel" autocomplete="tel" placeholder="55 0000 0000" />
+            </div>
+
+            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40 p-4 text-sm">
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">Contexto de acceso</p>
+                <div class="mt-2 space-y-1">
+                    <p class="font-medium text-navy-900 dark:text-zinc-100">{{ $companyName ?? 'Sin empresa asignada' }}</p>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                        {{ \App\Identity\Domain\Enums\RoleName::tryFrom(Auth::user()->getRoleNames()->first() ?? '')?->label() ?? 'Sin rol' }}
+                    </p>
+                </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
-                    </flux:button>
-                </div>
-
+                <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
+                    Guardar cambios
+                </flux:button>
             </div>
         </form>
-
-        @if ($this->showDeleteUser)
-            <livewire:pages::settings.delete-user-form />
-        @endif
     </x-pages::settings.layout>
 </section>

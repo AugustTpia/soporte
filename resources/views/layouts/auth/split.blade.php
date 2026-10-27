@@ -1,42 +1,75 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-neutral-800">
-                <div class="absolute inset-0 bg-neutral-900"></div>
-                <a href="{{ route('home') }}" class="relative z-20 flex items-center text-lg font-medium" wire:navigate>
-                    <span class="flex h-10 w-10 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="me-2 h-7 fill-current text-white" />
+    <body class="min-h-screen bg-surface antialiased dark:bg-zinc-950">
+        <div class="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+            <aside class="relative hidden overflow-hidden bg-navy-950 p-10 text-white lg:flex lg:flex-col">
+                <div class="pointer-events-none absolute -left-24 -top-24 size-80 rounded-full bg-royal-600/30 blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-32 -right-24 size-96 rounded-full bg-gold-400/10 blur-3xl"></div>
+
+                <a href="{{ route('home') }}" class="relative z-10 flex items-center gap-3" wire:navigate>
+                    <span class="flex size-11 items-center justify-center rounded-2xl bg-gold-400">
+                        <x-app-logo-icon class="size-7 text-navy-950" />
                     </span>
-                    {{ config('app.name', 'Laravel') }}
+                    <span class="text-lg font-semibold tracking-tight">{{ config('app.name', 'Soporte TI') }}</span>
                 </a>
 
-                @php
-                    [$message, $author] = str(Illuminate\Foundation\Inspiring::quotes()->random())->explode('-');
-                @endphp
+                <div class="relative z-10 my-auto max-w-xl py-16">
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gold-300">Continuidad operativa</p>
+                    <h1 class="mt-5 text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">
+                        Cada equipo, cada cuenta y cada soporte bajo control.
+                    </h1>
+                    <p class="mt-5 max-w-lg text-base leading-7 text-royal-100">
+                        Una plataforma clara para administrar servicios TI, proteger credenciales y conservar la trazabilidad de cada intervención.
+                    </p>
 
-                <div class="relative z-20 mt-auto">
-                    <blockquote class="space-y-2">
-                        <flux:heading size="lg">&ldquo;{{ trim($message) }}&rdquo;</flux:heading>
-                        <footer><flux:heading>{{ trim($author) }}</flux:heading></footer>
-                    </blockquote>
+                    <div class="mt-9 grid gap-3 text-sm text-royal-100">
+                        <div class="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+                            <span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg bg-gold-400 text-navy-950">
+                                <flux:icon.check class="size-3.5" />
+                            </span>
+                            <span>Información organizada por empresa, sede y responsable.</span>
+                        </div>
+                        <div class="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+                            <span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg bg-gold-400 text-navy-950">
+                                <flux:icon.check class="size-3.5" />
+                            </span>
+                            <span>Accesos por rol y registro de actividad para auditoría.</span>
+                        </div>
+                        <div class="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+                            <span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg bg-gold-400 text-navy-950">
+                                <flux:icon.check class="size-3.5" />
+                            </span>
+                            <span>Diseñado para trabajar con claridad en escritorio, tablet y móvil.</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="w-full lg:p-8">
-                <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden" wire:navigate>
-                        <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                            <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
+
+                <p class="relative z-10 text-xs text-royal-200">
+                    © {{ date('Y') }} {{ config('app.name', 'Soporte TI') }}. Acceso restringido a personal autorizado.
+                </p>
+            </aside>
+
+            <main class="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8 lg:px-12">
+                <div class="w-full max-w-md">
+                    <a href="{{ route('home') }}" class="mb-8 flex items-center justify-center gap-3 lg:hidden" wire:navigate>
+                        <span class="flex size-11 items-center justify-center rounded-2xl bg-gold-400">
+                            <x-app-logo-icon class="size-7 text-navy-950" />
                         </span>
-
-                        <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+                        <span class="text-lg font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ config('app.name', 'Soporte TI') }}</span>
                     </a>
-                    {{ $slot }}
+
+                    <div class="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_24px_70px_-35px_rgba(10,31,68,.35)] sm:p-8 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+                        {{ $slot }}
+                    </div>
+
+                    <p class="mt-6 text-center text-xs leading-5 text-zinc-400 dark:text-zinc-500">
+                        Si no tienes acceso, contacta al administrador de tu empresa.
+                    </p>
                 </div>
-            </div>
+            </main>
         </div>
 
         @persist('toast')

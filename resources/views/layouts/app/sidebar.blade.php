@@ -1,92 +1,103 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <body class="min-h-screen bg-surface text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+        @php
+            $tenantContext = app(\App\Shared\Application\Contracts\TenantContext::class);
+            $activeCompanyId = $tenantContext->companyId();
+            $activeCompany = $activeCompanyId ? app(\App\Companies\Domain\Repositories\CompanyRepository::class)->find($activeCompanyId) : null;
+            $isSuperAdmin = auth()->user()->isSuperAdmin();
+        @endphp
+
+        <flux:sidebar sticky collapsible="mobile" class="app-sidebar border-e border-white/10">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-                <flux:sidebar.collapse class="lg:hidden" />
+                <flux:sidebar.collapse class="lg:hidden text-white" />
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
+                <flux:sidebar.group heading="Principal" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        Panel
                     </flux:sidebar.item>
                 </flux:sidebar.group>
+
+                @if($isSuperAdmin)
+                    <flux:sidebar.group heading="Sistema" class="grid">
+                        <flux:sidebar.item icon="building-office-2" :href="route('companies.index')" :current="request()->routeIs('companies.*')" wire:navigate>
+                            Empresas
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
+
+                @if($activeCompanyId !== null)
+                    @if(auth()->user()->can('departments.view') || auth()->user()->can('users.view') || auth()->user()->can('audit.view'))
+                        <flux:sidebar.group heading="Administración" class="grid">
+                            @can('viewAny', \App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel::class)
+                                <flux:sidebar.item icon="building-office" :href="route('departments.index')" :current="request()->routeIs('departments.*')" wire:navigate>
+                                    Departamentos
+                                </flux:sidebar.item>
+                            @endcan
+
+                            @can('viewAny', \App\Identity\Infrastructure\Persistence\Eloquent\User::class)
+                                <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                                    Usuarios
+                                </flux:sidebar.item>
+                            @endcan
+
+                            @can('viewAny', \App\Auditing\Infrastructure\Persistence\Eloquent\Models\AuditLogModel::class)
+                                <flux:sidebar.item icon="shield-check" :href="route('audit.index')" :current="request()->routeIs('audit.*')" wire:navigate>
+                                    Auditoría
+                                </flux:sidebar.item>
+                            @endcan
+                        </flux:sidebar.group>
+                    @endif
+                @elseif($isSuperAdmin)
+                    @can('viewAny', \App\Auditing\Infrastructure\Persistence\Eloquent\Models\AuditLogModel::class)
+                        <flux:sidebar.group heading="Auditoría" class="grid">
+                            <flux:sidebar.item icon="shield-check" :href="route('audit.index')" :current="request()->routeIs('audit.*')" wire:navigate>
+                                Auditoría global
+                            </flux:sidebar.item>
+                        </flux:sidebar.group>
+                    @endcan
+                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />
+
+            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-royal-200">
+                    {{ $isSuperAdmin ? 'Empresa activa' : 'Tu empresa' }}
+                </p>
+                <p class="mt-1 truncate text-sm font-medium text-white">
+                    {{ $activeCompany?->name ?? ($isSuperAdmin ? 'Todas las empresas' : 'Sin empresa asignada') }}
+                </p>
+                @if($isSuperAdmin && $activeCompanyId === null)
+                    <p class="mt-1 text-[10px] leading-4 text-royal-200/80">
+                        Selecciona una empresa para administrar su equipo.
+                    </p>
+                @endif
+            </div>
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
-
-            <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
-        </flux:sidebar>
-
-        <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-
-            <flux:spacer />
-
-            <flux:dropdown position="top" align="end">
-                <flux:profile
-                    :initials="auth()->user()->initials()"
-                    icon-trailing="chevron-down"
-                />
-
-                <flux:menu>
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                                <flux:avatar
-                                    :name="auth()->user()->name"
-                                    :initials="auth()->user()->initials()"
-                                />
-
-                                <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
-                                    <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
-                                </div>
-                            </div>
-                        </div>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                            {{ __('Settings') }}
-                        </flux:menu.item>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
+                <flux:sidebar.group heading="Cuenta" class="grid">
+                    <flux:sidebar.item icon="cog-6-tooth" :href="route('profile.edit')" :current="request()->routeIs('profile.*')" wire:navigate>
+                        Configuración
+                    </flux:sidebar.item>
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <flux:menu.item
-                            as="button"
-                            type="submit"
-                            icon="arrow-right-start-on-rectangle"
-                            class="w-full cursor-pointer"
-                            data-test="logout-button"
-                        >
-                            {{ __('Log out') }}
-                        </flux:menu.item>
+                        <flux:sidebar.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full cursor-pointer" data-test="logout-button">
+                            Cerrar sesión
+                        </flux:sidebar.item>
                     </form>
-                </flux:menu>
-            </flux:dropdown>
-        </flux:header>
+                </flux:sidebar.group>
+            </flux:sidebar.nav>
+
+            <x-desktop-user-menu :name="auth()->user()->name" />
+        </flux:sidebar>
 
         {{ $slot }}
 

@@ -2,7 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
+use App\Identity\Infrastructure\Persistence\Eloquent\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
+    protected $model = User::class;
+
     /**
      * The current password being used by the factory.
      */
@@ -25,15 +28,26 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => null,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'status' => 'active',
+            'job_title' => fake()->jobTitle(),
+            'phone' => fake()->numerify('55########'),
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ];
+    }
+
+    public function forCompany(CompanyModel $company): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company->id,
+        ]);
     }
 
     /**

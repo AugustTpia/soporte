@@ -1,5 +1,9 @@
 <?php
 
+use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
+use App\Identity\Domain\Enums\RoleName;
+use App\Identity\Infrastructure\Persistence\Eloquent\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +48,50 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function seedRoles(): void
 {
-    // ..
+    test()->seed(RolesAndPermissionsSeeder::class);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createTestCompany(array $attributes = []): CompanyModel
+{
+    return CompanyModel::factory()->create($attributes);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createTestUser(CompanyModel $company, array $attributes = [], ?RoleName $role = null): User
+{
+    if ($role !== null) {
+        seedRoles();
+    }
+
+    $user = User::factory()->forCompany($company)->create($attributes);
+
+    if ($role !== null) {
+        $user->assignRole($role->value);
+    }
+
+    return $user;
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createTestSuperAdmin(array $attributes = []): User
+{
+    seedRoles();
+
+    $user = User::factory()->create([
+        'company_id' => null,
+        ...$attributes,
+    ]);
+
+    $user->assignRole(RoleName::SuperAdmin->value);
+
+    return $user;
 }

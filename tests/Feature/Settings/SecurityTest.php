@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Features;
 use Livewire\Livewire;
@@ -18,7 +17,7 @@ beforeEach(function () {
 });
 
 test('security settings page can be rendered', function () {
-    $user = User::factory()->create();
+    $user = createTestUser(createTestCompany());
 
     $response = $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])
@@ -26,14 +25,14 @@ test('security settings page can be rendered', function () {
 
     $response->assertOk();
 
-    $response->assertSee('Passkeys');
-    $response->assertSee('No passkeys yet');
-    $response->assertSee('Two-factor authentication');
-    $response->assertSee('Enable 2FA');
+    $response->assertSee('Llaves de acceso');
+    $response->assertSee('Aún no hay llaves de acceso');
+    $response->assertSee('Autenticación de dos factores');
+    $response->assertSee('Activar 2FA');
 });
 
 test('security settings page requires password confirmation when enabled', function () {
-    $user = User::factory()->create();
+    $user = createTestUser(createTestCompany());
 
     $response = $this->actingAs($user)
         ->get(route('security.edit'));
@@ -44,20 +43,20 @@ test('security settings page requires password confirmation when enabled', funct
 test('security settings page renders without two factor when feature is disabled', function () {
     config(['fortify.features' => []]);
 
-    $user = User::factory()->create();
+    $user = createTestUser(createTestCompany());
 
     $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])
         ->get(route('security.edit'))
         ->assertOk()
-        ->assertSee('Update password')
-        ->assertDontSee('Manage your passkeys for passwordless sign-in')
-        ->assertDontSee('Add a passkey to sign in without a password')
-        ->assertDontSee('Two-factor authentication');
+        ->assertSee('Actualizar contraseña')
+        ->assertDontSee('Administra tus llaves de acceso para iniciar sesión sin contraseña')
+        ->assertDontSee('Agrega una llave de acceso para iniciar sesión sin contraseña')
+        ->assertDontSee('Autenticación de dos factores');
 });
 
 test('two factor authentication disabled when confirmation abandoned between requests', function () {
-    $user = User::factory()->create();
+    $user = createTestUser(createTestCompany());
 
     $user->forceFill([
         'two_factor_secret' => encrypt('test-secret'),
@@ -79,7 +78,7 @@ test('two factor authentication disabled when confirmation abandoned between req
 });
 
 test('password can be updated', function () {
-    $user = User::factory()->create([
+    $user = createTestUser(createTestCompany(), [
         'password' => Hash::make('password'),
     ]);
 
@@ -97,7 +96,7 @@ test('password can be updated', function () {
 });
 
 test('correct password must be provided to update password', function () {
-    $user = User::factory()->create([
+    $user = createTestUser(createTestCompany(), [
         'password' => Hash::make('password'),
     ]);
 
