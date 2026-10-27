@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Accounts\Domain\Repositories\ServiceAccountRepository;
+use App\Accounts\Infrastructure\Persistence\Eloquent\Models\ServiceAccountModel;
+use App\Accounts\Infrastructure\Persistence\Eloquent\Repositories\EloquentServiceAccountRepository;
 use App\Assets\Domain\Repositories\AssetRepository;
 use App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel;
 use App\Assets\Infrastructure\Persistence\Eloquent\Repositories\EloquentAssetRepository;
@@ -27,6 +30,7 @@ use App\Policies\AuditLogPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\LocationPolicy;
+use App\Policies\ServiceAccountPolicy;
 use App\Policies\UserPolicy;
 use App\Presentation\Http\Middleware\ResolveTenant;
 use App\Shared\Application\Contracts\AuditLogger;
@@ -55,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AuditLogger::class, DatabaseAuditLogger::class);
         $this->app->bind(TransactionManager::class, LaravelTransactionManager::class);
 
+        $this->app->bind(ServiceAccountRepository::class, EloquentServiceAccountRepository::class);
         $this->app->bind(AssetRepository::class, EloquentAssetRepository::class);
         $this->app->bind(CompanyRepository::class, EloquentCompanyRepository::class);
         $this->app->bind(DepartmentRepository::class, EloquentDepartmentRepository::class);
@@ -107,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(DepartmentModel::class, DepartmentPolicy::class);
         Gate::policy(LocationModel::class, LocationPolicy::class);
         Gate::policy(AssetModel::class, AssetPolicy::class);
+        Gate::policy(ServiceAccountModel::class, ServiceAccountPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }
 

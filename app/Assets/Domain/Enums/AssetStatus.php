@@ -50,4 +50,9 @@ enum AssetStatus: string
     {
         return $this === $target || in_array($target, $this->allowedTransitions(), true);
     }
+
+    public function isLinkable(): bool
+    {
+        return in_array($this, [self::Active, self::InMaintenance, self::InStorage], true);
+    }
 }

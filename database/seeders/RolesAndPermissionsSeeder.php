@@ -27,6 +27,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'locations.manage',
             'assets.view',
             'assets.manage',
+            'accounts.view',
+            'accounts.manage',
             'audit.view',
         ];
 
@@ -50,6 +52,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'locations.manage',
                 'assets.view',
                 'assets.manage',
+                'accounts.view',
+                'accounts.manage',
                 'audit.view',
             ],
             RoleName::ServiceManager->value => [
@@ -59,23 +63,30 @@ class RolesAndPermissionsSeeder extends Seeder
                 'locations.view',
                 'assets.view',
                 'assets.manage',
+                'accounts.view',
+                'accounts.manage',
                 'audit.view',
             ],
             RoleName::Engineer->value => [
                 'locations.view',
                 'assets.view',
                 'assets.manage',
+                'accounts.view',
+                'accounts.manage',
             ],
             RoleName::Technician->value => [
                 'locations.view',
                 'assets.view',
                 'assets.manage',
+                'accounts.view',
+                'accounts.manage',
             ],
             RoleName::Auditor->value => [
                 'users.view',
                 'departments.view',
                 'locations.view',
                 'assets.view',
+                'accounts.view',
                 'audit.view',
             ],
             RoleName::ReadOnly->value => [
@@ -83,6 +94,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'departments.view',
                 'locations.view',
                 'assets.view',
+                'accounts.view',
             ],
         ];
 

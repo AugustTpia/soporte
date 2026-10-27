@@ -71,6 +71,17 @@ final class EloquentAssetRepository implements AssetRepository
         return $model ? $this->mapper->toDomain($model) : null;
     }
 
+    public function forCompany(int $companyId): array
+    {
+        return AssetModel::query()
+            ->with(['location', 'assignedUser'])
+            ->where('company_id', $companyId)
+            ->orderBy('internal_code')
+            ->get()
+            ->map(fn (AssetModel $model) => $this->mapper->toDomain($model))
+            ->all();
+    }
+
     public function save(Asset $asset): Asset
     {
         $model = $asset->id === null

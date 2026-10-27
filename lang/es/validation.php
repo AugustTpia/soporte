@@ -149,5 +149,12 @@ return [
         'ipAddress' => 'dirección IP',
         'purchaseDate' => 'fecha de compra',
         'warrantyUntil' => 'garantía hasta',
+        'username' => 'nombre de usuario',
+        'instance' => 'instancia o servidor',
+        'ownerName' => 'persona de la cuenta',
+        'responsibleUserId' => 'responsable',
+        'linkAssetId' => 'equipo',
+        'transferFromAssetId' => 'equipo de origen',
+        'transferToAssetId' => 'equipo destino',
     ],
 ];

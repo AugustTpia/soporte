@@ -25,6 +25,11 @@ interface AssetRepository
 
     public function find(int $id, int $companyId): ?Asset;
 
+    /**
+     * @return array<int, Asset>
+     */
+    public function forCompany(int $companyId): array;
+
     public function save(Asset $asset): Asset;
 
     public function internalCodeExists(int $companyId, string $internalCode, ?int $ignoreId = null): bool;
