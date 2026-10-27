@@ -23,6 +23,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'users.toggle',
             'departments.view',
             'departments.manage',
+            'locations.view',
+            'locations.manage',
             'audit.view',
         ];
 
@@ -42,24 +44,33 @@ class RolesAndPermissionsSeeder extends Seeder
                 'users.toggle',
                 'departments.view',
                 'departments.manage',
+                'locations.view',
+                'locations.manage',
                 'audit.view',
             ],
             RoleName::ServiceManager->value => [
                 'users.view',
                 'departments.view',
                 'departments.manage',
+                'locations.view',
                 'audit.view',
             ],
-            RoleName::Engineer->value => [],
-            RoleName::Technician->value => [],
+            RoleName::Engineer->value => [
+                'locations.view',
+            ],
+            RoleName::Technician->value => [
+                'locations.view',
+            ],
             RoleName::Auditor->value => [
                 'users.view',
                 'departments.view',
+                'locations.view',
                 'audit.view',
             ],
             RoleName::ReadOnly->value => [
                 'users.view',
                 'departments.view',
+                'locations.view',
             ],
         ];
 

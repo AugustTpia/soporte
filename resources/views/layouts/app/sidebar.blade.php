@@ -33,11 +33,17 @@
                 @endif
 
                 @if($activeCompanyId !== null)
-                    @if(auth()->user()->can('departments.view') || auth()->user()->can('users.view') || auth()->user()->can('audit.view'))
+                    @if(auth()->user()->can('departments.view') || auth()->user()->can('locations.view') || auth()->user()->can('users.view') || auth()->user()->can('audit.view'))
                         <flux:sidebar.group heading="Administración" class="grid">
                             @can('viewAny', \App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel::class)
                                 <flux:sidebar.item icon="building-office" :href="route('departments.index')" :current="request()->routeIs('departments.*')" wire:navigate>
                                     Departamentos
+                                </flux:sidebar.item>
+                            @endcan
+
+                            @can('viewAny', \App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel::class)
+                                <flux:sidebar.item icon="map-pin" :href="route('locations.index')" :current="request()->routeIs('locations.*')" wire:navigate>
+                                    Ubicaciones
                                 </flux:sidebar.item>
                             @endcan
 

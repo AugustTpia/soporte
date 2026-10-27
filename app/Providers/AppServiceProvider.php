@@ -16,9 +16,13 @@ use App\Departments\Infrastructure\Persistence\Eloquent\Repositories\EloquentDep
 use App\Identity\Domain\Repositories\UserRepository;
 use App\Identity\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use App\Identity\Infrastructure\Persistence\Eloquent\User;
+use App\Locations\Domain\Repositories\LocationRepository;
+use App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel;
+use App\Locations\Infrastructure\Persistence\Eloquent\Repositories\EloquentLocationRepository;
 use App\Policies\AuditLogPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\DepartmentPolicy;
+use App\Policies\LocationPolicy;
 use App\Policies\UserPolicy;
 use App\Presentation\Http\Middleware\ResolveTenant;
 use App\Shared\Application\Contracts\AuditLogger;
@@ -46,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(CompanyRepository::class, EloquentCompanyRepository::class);
         $this->app->bind(DepartmentRepository::class, EloquentDepartmentRepository::class);
+        $this->app->bind(LocationRepository::class, EloquentLocationRepository::class);
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);
         $this->app->bind(AuditRepository::class, EloquentAuditRepository::class);
     }
@@ -92,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(CompanyModel::class, CompanyPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(DepartmentModel::class, DepartmentPolicy::class);
+        Gate::policy(LocationModel::class, LocationPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }
 

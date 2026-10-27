@@ -26,7 +26,8 @@ test('super admins can visit the global dashboard without an active company', fu
         ->assertSee('Todas las empresas')
         ->assertSee('Selecciona una empresa para administrar su equipo')
         ->assertDontSee('href="'.route('users.index').'"', false)
-        ->assertDontSee('href="'.route('departments.index').'"', false);
+        ->assertDontSee('href="'.route('departments.index').'"', false)
+        ->assertDontSee('href="'.route('locations.index').'"', false);
 });
 
 test('super admins with an active company see administrative modules', function () {
@@ -39,6 +40,7 @@ test('super admins with an active company see administrative modules', function 
         ->assertOk()
         ->assertSee('href="'.route('users.index').'"', false)
         ->assertSee('href="'.route('departments.index').'"', false)
+        ->assertSee('href="'.route('locations.index').'"', false)
         ->assertSee('href="'.route('audit.index').'"', false);
 });
 

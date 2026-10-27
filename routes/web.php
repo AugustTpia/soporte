@@ -7,6 +7,8 @@ use App\Departments\Presentation\Livewire\DepartmentForm;
 use App\Departments\Presentation\Livewire\DepartmentIndex;
 use App\Identity\Presentation\Livewire\Users\UserForm;
 use App\Identity\Presentation\Livewire\Users\UserIndex;
+use App\Locations\Presentation\Livewire\LocationForm;
+use App\Locations\Presentation\Livewire\LocationIndex;
 use App\Presentation\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,10 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('departments', DepartmentIndex::class)->name('departments.index');
     Route::get('departments/create', DepartmentForm::class)->name('departments.create');
     Route::get('departments/{department}/edit', DepartmentForm::class)->name('departments.edit');
+
+    Route::get('locations', LocationIndex::class)->name('locations.index');
+    Route::get('locations/create', LocationForm::class)->name('locations.create');
+    Route::get('locations/{location}/edit', LocationForm::class)->name('locations.edit');
 
     Route::get('users', UserIndex::class)->name('users.index');
     Route::get('users/create', UserForm::class)->name('users.create');
