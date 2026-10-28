@@ -92,6 +92,50 @@
             </div>
         </section>
 
+        @if($maintenanceStats !== [])
+            <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <a href="{{ route('maintenance.index') }}" class="surface-card p-5 transition hover:border-royal-300 hover:bg-royal-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-royal-50 text-royal-700 dark:bg-royal-600/20 dark:text-royal-300">
+                            <flux:icon.wrench-screwdriver class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $maintenanceStats['active_plans'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Planes activos</p>
+                </a>
+
+                <a href="{{ route('maintenance.index', ['overdue' => 1]) }}" class="surface-card p-5 transition hover:border-rose-300 hover:bg-rose-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
+                            <flux:icon.exclamation-triangle class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $maintenanceStats['overdue'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Planes vencidos</p>
+                </a>
+
+                <a href="{{ route('maintenance.executions.index', ['status' => 'scheduled']) }}" class="surface-card p-5 transition hover:border-amber-300 hover:bg-amber-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+                            <flux:icon.calendar-days class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $maintenanceStats['scheduled'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Mantenimientos programados</p>
+                </a>
+
+                <a href="{{ route('maintenance.executions.index', ['status' => 'in_progress']) }}" class="surface-card p-5 transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                            <flux:icon.play class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $maintenanceStats['in_progress'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Mantenimientos en progreso</p>
+                </a>
+            </section>
+        @endif
+
         @if($ticketStats !== [])
             <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <a href="{{ route('tickets.index', ['scope' => 'unresolved']) }}" class="surface-card p-5 transition hover:border-royal-300 hover:bg-royal-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
@@ -191,6 +235,19 @@
                                 <span class="flex-1">
                                     <span class="block text-sm font-medium text-navy-900 dark:text-zinc-100">Tickets</span>
                                     <span class="block text-xs text-zinc-500 dark:text-zinc-400">Solicitudes de soporte y seguimiento</span>
+                                </span>
+                                <flux:icon.chevron-right class="size-4 text-zinc-400" />
+                            </a>
+                        @endcan
+
+                        @can('viewAny', \App\Maintenance\Infrastructure\Persistence\Eloquent\Models\MaintenancePlanModel::class)
+                            <a href="{{ route('maintenance.index') }}" class="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 transition hover:border-royal-300 hover:bg-royal-50/40 dark:hover:bg-zinc-800/60" wire:navigate>
+                                <span class="flex size-9 items-center justify-center rounded-lg bg-royal-50 text-royal-700 dark:bg-royal-600/20 dark:text-royal-300">
+                                    <flux:icon.wrench-screwdriver class="size-4" />
+                                </span>
+                                <span class="flex-1">
+                                    <span class="block text-sm font-medium text-navy-900 dark:text-zinc-100">Mantenimientos</span>
+                                    <span class="block text-xs text-zinc-500 dark:text-zinc-400">Planes preventivos y ejecuciones</span>
                                 </span>
                                 <flux:icon.chevron-right class="size-4 text-zinc-400" />
                             </a>

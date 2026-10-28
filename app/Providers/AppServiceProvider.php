@@ -39,6 +39,14 @@ use App\Identity\Infrastructure\Security\LaravelPasswordVerifier;
 use App\Locations\Domain\Repositories\LocationRepository;
 use App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel;
 use App\Locations\Infrastructure\Persistence\Eloquent\Repositories\EloquentLocationRepository;
+use App\Maintenance\Domain\Repositories\MaintenanceExecutionAttachmentRepository;
+use App\Maintenance\Domain\Repositories\MaintenanceExecutionRepository;
+use App\Maintenance\Domain\Repositories\MaintenancePlanRepository;
+use App\Maintenance\Infrastructure\Persistence\Eloquent\Models\MaintenanceExecutionModel;
+use App\Maintenance\Infrastructure\Persistence\Eloquent\Models\MaintenancePlanModel;
+use App\Maintenance\Infrastructure\Persistence\Eloquent\Repositories\EloquentMaintenanceExecutionAttachmentRepository;
+use App\Maintenance\Infrastructure\Persistence\Eloquent\Repositories\EloquentMaintenanceExecutionRepository;
+use App\Maintenance\Infrastructure\Persistence\Eloquent\Repositories\EloquentMaintenancePlanRepository;
 use App\Policies\AssetPolicy;
 use App\Policies\AuditLogPolicy;
 use App\Policies\BusTicketCancellationPolicy;
@@ -46,6 +54,8 @@ use App\Policies\CompanyPolicy;
 use App\Policies\CredentialPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\LocationPolicy;
+use App\Policies\MaintenanceExecutionPolicy;
+use App\Policies\MaintenancePlanPolicy;
 use App\Policies\ServiceAccountPolicy;
 use App\Policies\TicketPolicy;
 use App\Policies\UserPolicy;
@@ -90,6 +100,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EvidenceFileStorage::class, LocalEvidenceFileStorage::class);
         $this->app->bind(TicketRepository::class, EloquentTicketRepository::class);
         $this->app->bind(TicketAttachmentRepository::class, EloquentTicketAttachmentRepository::class);
+        $this->app->bind(MaintenancePlanRepository::class, EloquentMaintenancePlanRepository::class);
+        $this->app->bind(MaintenanceExecutionRepository::class, EloquentMaintenanceExecutionRepository::class);
+        $this->app->bind(MaintenanceExecutionAttachmentRepository::class, EloquentMaintenanceExecutionAttachmentRepository::class);
         $this->app->bind(CredentialRepository::class, EloquentCredentialRepository::class);
         $this->app->singleton(CredentialCipher::class, fn () => new LaravelCredentialCipher(
             currentKey: config('credentials.current_key'),
@@ -152,6 +165,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ServiceAccountModel::class, ServiceAccountPolicy::class);
         Gate::policy(SupportTicketModel::class, TicketPolicy::class);
         Gate::policy(BusTicketCancellationModel::class, BusTicketCancellationPolicy::class);
+        Gate::policy(MaintenancePlanModel::class, MaintenancePlanPolicy::class);
+        Gate::policy(MaintenanceExecutionModel::class, MaintenanceExecutionPolicy::class);
         Gate::policy(CredentialModel::class, CredentialPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }

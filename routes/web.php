@@ -22,6 +22,13 @@ use App\Identity\Presentation\Livewire\Users\UserForm;
 use App\Identity\Presentation\Livewire\Users\UserIndex;
 use App\Locations\Presentation\Livewire\LocationForm;
 use App\Locations\Presentation\Livewire\LocationIndex;
+use App\Maintenance\Presentation\Http\Controllers\MaintenanceExecutionAttachmentDownloadController;
+use App\Maintenance\Presentation\Livewire\MaintenanceExecutionForm;
+use App\Maintenance\Presentation\Livewire\MaintenanceExecutionIndex;
+use App\Maintenance\Presentation\Livewire\MaintenanceExecutionShow;
+use App\Maintenance\Presentation\Livewire\MaintenancePlanForm;
+use App\Maintenance\Presentation\Livewire\MaintenancePlanIndex;
+use App\Maintenance\Presentation\Livewire\MaintenancePlanShow;
 use App\Presentation\Livewire\Dashboard;
 use App\Support\Presentation\Http\Controllers\TicketAttachmentDownloadController;
 use App\Support\Presentation\Livewire\Tickets\TicketForm;
@@ -65,6 +72,22 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('tickets/{ticket}/attachments/{attachment}/download', TicketAttachmentDownloadController::class)
         ->whereNumber('attachment')
         ->name('tickets.attachments.download');
+
+    Route::get('maintenance', MaintenancePlanIndex::class)->name('maintenance.index');
+    Route::get('maintenance/plans/create', MaintenancePlanForm::class)->name('maintenance.plans.create');
+    Route::get('maintenance/plans/{plan}', MaintenancePlanShow::class)->name('maintenance.plans.show');
+    Route::get('maintenance/plans/{plan}/edit', MaintenancePlanForm::class)->name('maintenance.plans.edit');
+
+    Route::get('maintenance/executions', MaintenanceExecutionIndex::class)->name('maintenance.executions.index');
+    Route::get('maintenance/executions/create/{plan?}', MaintenanceExecutionForm::class)
+        ->whereNumber('plan')
+        ->name('maintenance.executions.create');
+    Route::get('maintenance/executions/{execution}/edit', MaintenanceExecutionForm::class)->name('maintenance.executions.edit');
+    Route::get('maintenance/executions/{execution}', MaintenanceExecutionShow::class)->name('maintenance.executions.show');
+    Route::get('maintenance/executions/{execution}/attachments/{attachment}/download', MaintenanceExecutionAttachmentDownloadController::class)
+        ->whereNumber('execution')
+        ->whereNumber('attachment')
+        ->name('maintenance.executions.attachments.download');
 
     Route::middleware('company.feature:bus_ticket_cancellations')->group(function () {
         Route::get('bus-ticket-cancellations', BusTicketCancellationIndex::class)->name('bus-ticket-cancellations.index');

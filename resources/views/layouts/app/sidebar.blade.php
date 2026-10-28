@@ -34,11 +34,16 @@
                 @endif
 
                 @if($activeCompanyId !== null)
-                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view') || auth()->user()->can('credentials.view') || auth()->user()->can('tickets.view') || ($busFeatureEnabled && auth()->user()->can('bus_ticket_cancellations.view')))
+                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view') || auth()->user()->can('credentials.view') || auth()->user()->can('tickets.view') || auth()->user()->can('maintenance.view') || ($busFeatureEnabled && auth()->user()->can('bus_ticket_cancellations.view')))
                         <flux:sidebar.group heading="Operación" class="grid">
                             @can('viewAny', \App\Support\Infrastructure\Persistence\Eloquent\Models\SupportTicketModel::class)
                                 <flux:sidebar.item icon="ticket" :href="route('tickets.index')" :current="request()->routeIs('tickets.*')" wire:navigate>
                                     Tickets
+                                </flux:sidebar.item>
+                            @endcan
+                            @can('viewAny', \App\Maintenance\Infrastructure\Persistence\Eloquent\Models\MaintenancePlanModel::class)
+                                <flux:sidebar.item icon="wrench-screwdriver" :href="route('maintenance.index')" :current="request()->routeIs('maintenance.*')" wire:navigate>
+                                    Mantenimientos
                                 </flux:sidebar.item>
                             @endcan
                             @if($busFeatureEnabled)
