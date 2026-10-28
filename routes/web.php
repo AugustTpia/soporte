@@ -30,6 +30,8 @@ use App\Maintenance\Presentation\Livewire\MaintenancePlanForm;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanIndex;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanShow;
 use App\Presentation\Livewire\Dashboard;
+use App\Reports\Presentation\Http\Controllers\ReportExportController;
+use App\Reports\Presentation\Livewire\ReportIndex;
 use App\Support\Presentation\Http\Controllers\TicketAttachmentDownloadController;
 use App\Support\Presentation\Livewire\Tickets\TicketForm;
 use App\Support\Presentation\Livewire\Tickets\TicketIndex;
@@ -99,6 +101,9 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
             ->whereNumber('attachment')
             ->name('bus-ticket-cancellations.attachments.download');
     });
+
+    Route::get('reports', ReportIndex::class)->name('reports.index');
+    Route::get('reports/export/{report}', ReportExportController::class)->name('reports.export');
 
     Route::get('credentials', CredentialIndex::class)->name('credentials.index');
     Route::get('credentials/create', CredentialForm::class)->name('credentials.create');

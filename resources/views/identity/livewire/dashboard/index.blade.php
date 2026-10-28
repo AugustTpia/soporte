@@ -253,6 +253,19 @@
                             </a>
                         @endcan
 
+                        @if(auth()->user()->can('tickets.view') || auth()->user()->can('maintenance.view') || ($company->hasFeature(\App\Companies\Domain\Enums\CompanyFeature::BusTicketCancellations) && auth()->user()->can('bus_ticket_cancellations.view')))
+                            <a href="{{ route('reports.index') }}" class="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 transition hover:border-royal-300 hover:bg-royal-50/40 dark:hover:bg-zinc-800/60" wire:navigate>
+                                <span class="flex size-9 items-center justify-center rounded-lg bg-royal-50 text-royal-700 dark:bg-royal-600/20 dark:text-royal-300">
+                                    <flux:icon.chart-bar class="size-4" />
+                                </span>
+                                <span class="flex-1">
+                                    <span class="block text-sm font-medium text-navy-900 dark:text-zinc-100">Reportes</span>
+                                    <span class="block text-xs text-zinc-500 dark:text-zinc-400">Tickets, mantenimientos y cancelaciones</span>
+                                </span>
+                                <flux:icon.chevron-right class="size-4 text-zinc-400" />
+                            </a>
+                        @endif
+
                         @can('viewAny', \App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel::class)
                             <a href="{{ route('departments.index') }}" class="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 transition hover:border-royal-300 hover:bg-royal-50/40 dark:hover:bg-zinc-800/60" wire:navigate>
                                 <span class="flex size-9 items-center justify-center rounded-lg bg-gold-400/20 text-navy-900 dark:bg-gold-400/10 dark:text-gold-300">

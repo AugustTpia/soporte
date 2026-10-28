@@ -60,6 +60,16 @@ use App\Policies\ServiceAccountPolicy;
 use App\Policies\TicketPolicy;
 use App\Policies\UserPolicy;
 use App\Presentation\Http\Middleware\ResolveTenant;
+use App\Reports\Application\Contracts\CancellationReportQuery;
+use App\Reports\Application\Contracts\CsvReportExporter;
+use App\Reports\Application\Contracts\MaintenanceReportQuery;
+use App\Reports\Application\Contracts\PdfReportExporter;
+use App\Reports\Application\Contracts\TicketReportQuery;
+use App\Reports\Infrastructure\Export\CsvReportExporter as CsvFileExporter;
+use App\Reports\Infrastructure\Export\PdfReportExporter as PdfFileExporter;
+use App\Reports\Infrastructure\Queries\EloquentCancellationReportQuery;
+use App\Reports\Infrastructure\Queries\EloquentMaintenanceReportQuery;
+use App\Reports\Infrastructure\Queries\EloquentTicketReportQuery;
 use App\Shared\Application\Contracts\AuditLogger;
 use App\Shared\Application\Contracts\TenantContext;
 use App\Shared\Application\Contracts\TransactionManager;
@@ -115,6 +125,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LocationRepository::class, EloquentLocationRepository::class);
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);
         $this->app->bind(AuditRepository::class, EloquentAuditRepository::class);
+        $this->app->bind(TicketReportQuery::class, EloquentTicketReportQuery::class);
+        $this->app->bind(MaintenanceReportQuery::class, EloquentMaintenanceReportQuery::class);
+        $this->app->bind(CancellationReportQuery::class, EloquentCancellationReportQuery::class);
+        $this->app->bind(CsvReportExporter::class, CsvFileExporter::class);
+        $this->app->bind(PdfReportExporter::class, PdfFileExporter::class);
     }
 
     /**

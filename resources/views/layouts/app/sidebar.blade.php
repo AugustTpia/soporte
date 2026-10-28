@@ -68,6 +68,11 @@
                                     Credenciales
                                 </flux:sidebar.item>
                             @endcan
+                            @if(auth()->user()->can('tickets.view') || auth()->user()->can('maintenance.view') || ($busFeatureEnabled && auth()->user()->can('bus_ticket_cancellations.view')))
+                                <flux:sidebar.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.*')" wire:navigate>
+                                    Reportes
+                                </flux:sidebar.item>
+                            @endif
                         </flux:sidebar.group>
                     @endif
 
