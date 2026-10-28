@@ -110,6 +110,10 @@
                         <dd class="text-right text-zinc-700 dark:text-zinc-300">{{ $ticket->requesterContact ?: '—' }}</dd>
                     </div>
                     <div class="flex items-start justify-between gap-4">
+                        <dt class="text-zinc-500 dark:text-zinc-400">Contacto registrado</dt>
+                        <dd class="text-right text-zinc-700 dark:text-zinc-300">{{ $ticket->clientContactName ?: '—' }}</dd>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
                         <dt class="text-zinc-500 dark:text-zinc-400">Ubicación</dt>
                         <dd class="text-right text-zinc-700 dark:text-zinc-300">{{ $ticket->locationName ?: '—' }}</dd>
                     </div>

@@ -19,10 +19,14 @@ use App\BusTicketCancellations\Domain\Repositories\BusTicketCancellationReposito
 use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Models\BusTicketCancellationModel;
 use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Repositories\EloquentBusTicketCancellationAttachmentRepository;
 use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Repositories\EloquentBusTicketCancellationRepository;
+use App\Companies\Application\Contracts\CompanyOverviewQuery;
 use App\Companies\Domain\Repositories\CompanyRepository;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
 use App\Companies\Infrastructure\Persistence\Eloquent\Repositories\EloquentCompanyRepository;
+use App\Companies\Infrastructure\Queries\EloquentCompanyOverviewQuery;
 use App\Companies\Presentation\Livewire\Companies\CompanySwitcher;
+use App\Contacts\Domain\Repositories\ClientContactRepository;
+use App\Contacts\Infrastructure\Persistence\Eloquent\Repositories\EloquentClientContactRepository;
 use App\Credentials\Application\Contracts\CredentialCipher;
 use App\Credentials\Domain\Repositories\CredentialRepository;
 use App\Credentials\Infrastructure\Encryption\LaravelCredentialCipher;
@@ -121,6 +125,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PasswordVerifier::class, LaravelPasswordVerifier::class);
         $this->app->bind(AssetRepository::class, EloquentAssetRepository::class);
         $this->app->bind(CompanyRepository::class, EloquentCompanyRepository::class);
+        $this->app->bind(ClientContactRepository::class, EloquentClientContactRepository::class);
+        $this->app->bind(CompanyOverviewQuery::class, EloquentCompanyOverviewQuery::class);
         $this->app->bind(DepartmentRepository::class, EloquentDepartmentRepository::class);
         $this->app->bind(LocationRepository::class, EloquentLocationRepository::class);
         $this->app->bind(UserRepository::class, EloquentUserRepository::class);

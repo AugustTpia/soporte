@@ -78,6 +78,22 @@
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2">
+                @if(auth()->user()->can('contacts.view'))
+                    <div class="sm:col-span-2">
+                        <flux:select wire:model.live="clientContactId" label="Contacto del cliente">
+                            <option value="">Sin contacto registrado</option>
+                            @foreach($contactOptions as $contact)
+                                <option value="{{ $contact['id'] }}">
+                                    {{ $contact['name'] }}{{ $contact['contact'] ? ' · '.$contact['contact'] : '' }}
+                                </option>
+                            @endforeach
+                        </flux:select>
+                        <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                            Al seleccionar un contacto se copian sus datos como referencia. El ticket conserva una instantánea histórica.
+                        </p>
+                    </div>
+                @endif
+
                 <flux:input wire:model="requesterName" label="Nombre" placeholder="Ej. Juan Pérez" maxlength="150" />
                 <flux:input wire:model="requesterContact" label="Medio de contacto" placeholder="Teléfono, correo o extensión" maxlength="150" />
             </div>

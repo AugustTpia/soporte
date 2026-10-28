@@ -5,6 +5,7 @@ namespace App\Support\Infrastructure\Persistence\Eloquent\Models;
 use App\Accounts\Infrastructure\Persistence\Eloquent\Models\ServiceAccountModel;
 use App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
+use App\Contacts\Infrastructure\Persistence\Eloquent\Models\ClientContactModel;
 use App\Identity\Infrastructure\Persistence\Eloquent\User;
 use App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel;
 use Carbon\CarbonImmutable;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $location_id
  * @property int|null $asset_id
  * @property int|null $service_account_id
+ * @property int|null $client_contact_id
  * @property string $category
  * @property string $subject
  * @property string $description
@@ -42,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read LocationModel|null $location
  * @property-read AssetModel|null $asset
  * @property-read ServiceAccountModel|null $serviceAccount
+ * @property-read ClientContactModel|null $clientContact
  * @property-read User|null $creator
  * @property-read Collection<int, TicketAssignmentModel> $assignments
  * @property-read Collection<int, TicketAssignmentModel> $activeAssignments
@@ -60,6 +63,7 @@ class SupportTicketModel extends Model
         'location_id',
         'asset_id',
         'service_account_id',
+        'client_contact_id',
         'category',
         'subject',
         'description',
@@ -122,6 +126,14 @@ class SupportTicketModel extends Model
     public function serviceAccount(): BelongsTo
     {
         return $this->belongsTo(ServiceAccountModel::class, 'service_account_id');
+    }
+
+    /**
+     * @return BelongsTo<ClientContactModel, $this>
+     */
+    public function clientContact(): BelongsTo
+    {
+        return $this->belongsTo(ClientContactModel::class, 'client_contact_id');
     }
 
     /**

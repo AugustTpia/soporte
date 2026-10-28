@@ -28,6 +28,7 @@ final class SupportTicket
         public ?int $locationId,
         public ?int $assetId,
         public ?int $serviceAccountId,
+        public ?int $clientContactId,
         public DateTimeImmutable $openedAt,
         public ?DateTimeImmutable $dueAt = null,
         public ?DateTimeImmutable $resolvedAt = null,
@@ -38,6 +39,7 @@ final class SupportTicket
         public ?string $locationName = null,
         public ?string $assetLabel = null,
         public ?string $accountLabel = null,
+        public ?string $clientContactName = null,
         public ?string $creatorName = null,
         public array $assignments = [],
         public array $activities = [],
@@ -56,6 +58,7 @@ final class SupportTicket
         ?int $locationId = null,
         ?int $assetId = null,
         ?int $serviceAccountId = null,
+        ?int $clientContactId = null,
         ?DateTimeImmutable $dueAt = null,
         ?DateTimeImmutable $openedAt = null,
         ?int $createdBy = null,
@@ -74,6 +77,7 @@ final class SupportTicket
             locationId: $locationId,
             assetId: $assetId,
             serviceAccountId: $serviceAccountId,
+            clientContactId: $clientContactId,
             openedAt: $openedAt ?? new DateTimeImmutable,
             dueAt: $dueAt,
             createdBy: $createdBy,
@@ -90,7 +94,8 @@ final class SupportTicket
         ?int $locationId,
         ?int $assetId,
         ?int $serviceAccountId,
-        ?DateTimeImmutable $dueAt,
+        ?int $clientContactId = null,
+        ?DateTimeImmutable $dueAt = null,
     ): void {
         if ($this->status === TicketStatus::Cancelled) {
             throw DomainException::because('No se puede editar un ticket cancelado.');
@@ -105,6 +110,7 @@ final class SupportTicket
         $this->locationId = $locationId;
         $this->assetId = $assetId;
         $this->serviceAccountId = $serviceAccountId;
+        $this->clientContactId = $clientContactId;
         $this->dueAt = $dueAt;
 
         $this->guard();
@@ -256,6 +262,7 @@ final class SupportTicket
             'location_id' => $this->locationId,
             'asset_id' => $this->assetId,
             'service_account_id' => $this->serviceAccountId,
+            'client_contact_id' => $this->clientContactId,
             'opened_at' => $this->openedAt->format('Y-m-d H:i:s'),
             'due_at' => $this->dueAt?->format('Y-m-d H:i:s'),
             'resolved_at' => $this->resolvedAt?->format('Y-m-d H:i:s'),
@@ -295,6 +302,10 @@ final class SupportTicket
 
         if ($this->serviceAccountId !== null && $this->serviceAccountId <= 0) {
             throw DomainException::because('La cuenta seleccionada no es válida.');
+        }
+
+        if ($this->clientContactId !== null && $this->clientContactId <= 0) {
+            throw DomainException::because('El contacto seleccionado no es válido.');
         }
 
         if ($this->dueAt !== null && $this->dueAt < $this->openedAt) {

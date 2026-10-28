@@ -36,6 +36,7 @@ final class SupportTicketMapper
             locationId: $model->location_id,
             assetId: $model->asset_id,
             serviceAccountId: $model->service_account_id,
+            clientContactId: $model->client_contact_id,
             openedAt: $this->toDate($model->opened_at) ?? new DateTimeImmutable,
             dueAt: $this->toDate($model->due_at),
             resolvedAt: $this->toDate($model->resolved_at),
@@ -46,6 +47,7 @@ final class SupportTicketMapper
             locationName: $model->relationLoaded('location') ? $model->location?->name : null,
             assetLabel: $model->relationLoaded('asset') ? $this->assetLabel($model) : null,
             accountLabel: $model->relationLoaded('serviceAccount') ? $this->accountLabel($model) : null,
+            clientContactName: $model->relationLoaded('clientContact') ? $model->clientContact?->name : null,
             creatorName: $model->relationLoaded('creator') ? $model->creator?->name : null,
             assignments: $model->relationLoaded('assignments')
                 ? $model->assignments->map(fn (TicketAssignmentModel $assignment) => $this->assignments->toDomain($assignment))->all()
@@ -63,6 +65,7 @@ final class SupportTicketMapper
         $model->location_id = $ticket->locationId;
         $model->asset_id = $ticket->assetId;
         $model->service_account_id = $ticket->serviceAccountId;
+        $model->client_contact_id = $ticket->clientContactId;
         $model->category = $ticket->category->value;
         $model->subject = $ticket->subject;
         $model->description = $ticket->description;

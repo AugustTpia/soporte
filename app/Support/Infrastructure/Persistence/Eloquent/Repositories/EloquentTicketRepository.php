@@ -29,7 +29,7 @@ final class EloquentTicketRepository implements TicketRepository
     public function search(int $companyId, TicketFilters $filters, int $page = 1, int $perPage = 15): Page
     {
         $query = SupportTicketModel::query()
-            ->with(['location', 'asset', 'serviceAccount', 'creator', 'assignments.user'])
+            ->with(['location', 'asset', 'serviceAccount', 'clientContact', 'creator', 'assignments.user'])
             ->where('company_id', $companyId)
             ->when(filled($filters->term), function ($query) use ($filters): void {
                 $term = $filters->term;
@@ -72,6 +72,7 @@ final class EloquentTicketRepository implements TicketRepository
                 'location',
                 'asset',
                 'serviceAccount',
+                'clientContact',
                 'creator',
                 'assignments.user',
                 'activities.actor',
@@ -85,7 +86,7 @@ final class EloquentTicketRepository implements TicketRepository
     public function forCompany(int $companyId): array
     {
         return SupportTicketModel::query()
-            ->with(['location', 'asset', 'serviceAccount', 'creator'])
+            ->with(['location', 'asset', 'serviceAccount', 'clientContact', 'creator'])
             ->where('company_id', $companyId)
             ->orderByDesc('opened_at')
             ->orderByDesc('id')

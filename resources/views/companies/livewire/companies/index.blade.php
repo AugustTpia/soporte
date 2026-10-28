@@ -48,7 +48,9 @@
                                         <flux:icon.building-office-2 class="size-5" />
                                     </span>
                                     <div class="min-w-0">
-                                        <p class="truncate font-semibold text-navy-900 dark:text-zinc-100">{{ $company->name }}</p>
+                                        <a href="{{ route('companies.show', $company->publicId) }}" wire:navigate class="truncate font-semibold text-navy-900 hover:text-royal-700 dark:text-zinc-100 dark:hover:text-royal-300">
+                                            {{ $company->name }}
+                                        </a>
                                         <p class="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
                                             {{ $company->legalName ?: 'Sin razón social registrada' }}
                                         </p>
@@ -81,6 +83,15 @@
                             </td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center justify-end gap-1">
+                                    <flux:button
+                                        size="sm"
+                                        variant="subtle"
+                                        icon="eye"
+                                        :href="route('companies.show', $company->publicId)"
+                                        wire:navigate
+                                        aria-label="Ver ficha de {{ $company->name }}"
+                                    />
+
                                     <flux:button
                                         size="sm"
                                         variant="subtle"

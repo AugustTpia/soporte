@@ -12,6 +12,7 @@ use App\BusTicketCancellations\Presentation\Livewire\BusTicketCancellationIndex;
 use App\BusTicketCancellations\Presentation\Livewire\BusTicketCancellationShow;
 use App\Companies\Presentation\Livewire\Companies\CompanyForm;
 use App\Companies\Presentation\Livewire\Companies\CompanyIndex;
+use App\Companies\Presentation\Livewire\Companies\CompanyShow;
 use App\Credentials\Presentation\Http\Controllers\CredentialRevealController;
 use App\Credentials\Presentation\Http\Controllers\CredentialSecretController;
 use App\Credentials\Presentation\Livewire\CredentialForm;
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
 
     Route::get('companies', CompanyIndex::class)->name('companies.index');
     Route::get('companies/create', CompanyForm::class)->name('companies.create');
+    Route::get('companies/{company:public_id}', CompanyShow::class)->name('companies.show');
     Route::get('companies/{company:public_id}/edit', CompanyForm::class)->name('companies.edit');
 
     Route::get('departments', DepartmentIndex::class)->name('departments.index');

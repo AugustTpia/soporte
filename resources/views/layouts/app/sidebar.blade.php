@@ -23,6 +23,17 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         Panel
                     </flux:sidebar.item>
+
+                    @if($activeCompany && auth()->user()->can('companies.view'))
+                        <flux:sidebar.item
+                            icon="building-office-2"
+                            :href="route('companies.show', $activeCompany->publicId)"
+                            :current="request()->routeIs('companies.show')"
+                            wire:navigate
+                        >
+                            {{ $isSuperAdmin ? 'Ficha del cliente' : 'Mi empresa' }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
 
                 @if($isSuperAdmin)

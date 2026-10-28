@@ -18,6 +18,7 @@ final readonly class TicketInput
         public ?int $locationId = null,
         public ?int $assetId = null,
         public ?int $serviceAccountId = null,
+        public ?int $clientContactId = null,
         public ?DateTimeImmutable $dueAt = null,
     ) {}
 }

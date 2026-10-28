@@ -5,6 +5,8 @@ namespace App\Support\Presentation\Livewire\Tickets;
 use App\Accounts\Domain\Repositories\ServiceAccountRepository;
 use App\Assets\Domain\Repositories\AssetRepository;
 use App\Companies\Domain\Repositories\CompanyRepository;
+use App\Contacts\Domain\Entities\ClientContact;
+use App\Contacts\Domain\Repositories\ClientContactRepository;
 use App\Locations\Domain\Repositories\LocationRepository;
 use App\Shared\Application\Contracts\TenantContext;
 use App\Shared\Domain\Exceptions\DomainException;
@@ -51,6 +53,10 @@ class TicketForm extends Component
 
     public string $serviceAccountId = '';
 
+    public string $clientContactId = '';
+
+    public ?int $originalClientContactId = null;
+
     public string $dueAt = '';
 
     /** @var array<int, array{id: int, name: string}> */
@@ -61,6 +67,9 @@ class TicketForm extends Component
 
     /** @var array<int, array{id: int, label: string}> */
     public array $accountOptions = [];
+
+    /** @var array<int, array{id: int, name: string, contact: string|null}> */
+    public array $contactOptions = [];
 
     /** @var array<string, string> */
     public array $categoryOptions = [];
@@ -111,6 +120,8 @@ class TicketForm extends Component
         $this->locationId = $domain->locationId === null ? '' : (string) $domain->locationId;
         $this->assetId = $domain->assetId === null ? '' : (string) $domain->assetId;
         $this->serviceAccountId = $domain->serviceAccountId === null ? '' : (string) $domain->serviceAccountId;
+        $this->clientContactId = $domain->clientContactId === null ? '' : (string) $domain->clientContactId;
+        $this->originalClientContactId = $domain->clientContactId;
         $this->dueAt = $domain->dueAt?->format('Y-m-d\TH:i') ?? '';
 
         $this->loadOptions();
@@ -145,6 +156,20 @@ class TicketForm extends Component
                 'integer',
                 Rule::exists('service_accounts', 'id')->where('company_id', $this->companyId),
             ],
+            'clientContactId' => [
+                'nullable',
+                'integer',
+                Rule::exists('client_contacts', 'id')->where(function ($query): void {
+                    $query->where('company_id', $this->companyId)
+                        ->where(function ($query): void {
+                            $query->where('is_active', true);
+
+                            if ($this->originalClientContactId !== null) {
+                                $query->orWhere('id', $this->originalClientContactId);
+                            }
+                        });
+                }),
+            ],
             'dueAt' => ['nullable', 'date_format:Y-m-d\TH:i'],
         ]);
 
@@ -158,6 +183,7 @@ class TicketForm extends Component
             locationId: $this->integerOrNull($validated['locationId'] ?? null),
             assetId: $this->integerOrNull($validated['assetId'] ?? null),
             serviceAccountId: $this->integerOrNull($validated['serviceAccountId'] ?? null),
+            clientContactId: $this->integerOrNull($validated['clientContactId'] ?? null),
             dueAt: $this->dateTimeOrNull($validated['dueAt'] ?? null),
         );
 
@@ -193,6 +219,22 @@ class TicketForm extends Component
         ]);
     }
 
+    public function updatedClientContactId(mixed $value): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        $contact = app(ClientContactRepository::class)->find((int) $value, (int) $this->companyId);
+
+        if ($contact === null) {
+            return;
+        }
+
+        $this->requesterName = $contact->name;
+        $this->requesterContact = $contact->contactValue() ?? $this->requesterContact;
+    }
+
     private function loadOptions(): void
     {
         if ($this->companyId === null) {
@@ -217,6 +259,22 @@ class TicketForm extends Component
             ->map(fn ($account) => [
                 'id' => $account->id,
                 'label' => $account->username.' · '.$account->instance,
+            ])
+            ->all();
+
+        if (! auth()->user()->can('contacts.view')) {
+            $this->contactOptions = [];
+
+            return;
+        }
+
+        $includeId = $this->clientContactId === '' ? null : (int) $this->clientContactId;
+
+        $this->contactOptions = collect(app(ClientContactRepository::class)->forCompany($this->companyId, true, $includeId))
+            ->map(fn (ClientContact $contact) => [
+                'id' => $contact->id,
+                'name' => $contact->name.($contact->isActive ? '' : ' (inactivo)'),
+                'contact' => $contact->contactValue(),
             ])
             ->all();
     }

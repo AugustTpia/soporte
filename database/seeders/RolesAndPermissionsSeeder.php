@@ -17,6 +17,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissions = [
             'companies.view',
             'companies.manage',
+            'contacts.view',
+            'contacts.manage',
             'users.view',
             'users.create',
             'users.update',
@@ -54,6 +56,8 @@ class RolesAndPermissionsSeeder extends Seeder
             RoleName::SuperAdmin->value => $permissions,
             RoleName::CompanyAdmin->value => [
                 'companies.view',
+                'contacts.view',
+                'contacts.manage',
                 'users.view',
                 'users.create',
                 'users.update',
@@ -81,6 +85,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'audit.view',
             ],
             RoleName::ServiceManager->value => [
+                'companies.view',
+                'contacts.view',
+                'contacts.manage',
                 'users.view',
                 'departments.view',
                 'departments.manage',
@@ -104,6 +111,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'audit.view',
             ],
             RoleName::Engineer->value => [
+                'companies.view',
+                'contacts.view',
                 'locations.view',
                 'assets.view',
                 'assets.manage',
@@ -118,6 +127,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'maintenance.manage',
             ],
             RoleName::Technician->value => [
+                'companies.view',
+                'contacts.view',
                 'locations.view',
                 'assets.view',
                 'assets.manage',
@@ -132,6 +143,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'maintenance.manage',
             ],
             RoleName::Auditor->value => [
+                'companies.view',
+                'contacts.view',
                 'users.view',
                 'departments.view',
                 'locations.view',
@@ -144,6 +157,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'audit.view',
             ],
             RoleName::ReadOnly->value => [
+                'companies.view',
+                'contacts.view',
                 'users.view',
                 'departments.view',
                 'locations.view',
