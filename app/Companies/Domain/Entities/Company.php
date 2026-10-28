@@ -2,6 +2,7 @@
 
 namespace App\Companies\Domain\Entities;
 
+use App\Companies\Domain\Enums\CompanyFeature;
 use App\Companies\Domain\Enums\CompanyStatus;
 use App\Shared\Domain\Exceptions\DomainException;
 use DateTimeZone;
@@ -106,6 +107,26 @@ final class Company
     public function isActive(): bool
     {
         return $this->status === CompanyStatus::Active;
+    }
+
+    public function hasFeature(CompanyFeature $feature): bool
+    {
+        $features = $this->settings['features'] ?? [];
+
+        return is_array($features) && (bool) ($features[$feature->value] ?? false);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function settingsWithFeature(CompanyFeature $feature, bool $enabled): array
+    {
+        $settings = $this->settings ?? [];
+        $features = is_array($settings['features'] ?? null) ? $settings['features'] : [];
+        $features[$feature->value] = $enabled;
+        $settings['features'] = $features;
+
+        return $settings;
     }
 
     private function guard(): void

@@ -94,6 +94,28 @@
             </div>
         </div>
 
+        @if($isEditing)
+            <div class="surface-card p-5 sm:p-6">
+                <div class="flex items-start gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                    <span class="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                        <flux:icon.puzzle-piece class="size-5" />
+                    </span>
+                    <div>
+                        <h2 class="font-semibold text-navy-900 dark:text-zinc-100">Módulos opcionales</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Activa solo las funciones que esta empresa utiliza.</p>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <flux:switch
+                        wire:model="busTicketCancellations"
+                        label="Cancelación de boletos de autobús"
+                        description="Registra y reporta cancelaciones realizadas manualmente, sin modificar sistemas externos."
+                    />
+                </div>
+            </div>
+        @endif
+
         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-2">
                 <flux:button :href="route('companies.index')" variant="ghost" wire:navigate>

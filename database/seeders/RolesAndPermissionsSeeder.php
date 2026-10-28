@@ -32,6 +32,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'credentials.view',
             'credentials.manage',
             'credentials.reveal',
+            'tickets.view',
+            'tickets.create',
+            'tickets.manage',
+            'tickets.assign',
+            'tickets.cancel',
+            'bus_ticket_cancellations.view',
+            'bus_ticket_cancellations.manage',
             'audit.view',
         ];
 
@@ -60,6 +67,13 @@ class RolesAndPermissionsSeeder extends Seeder
                 'credentials.view',
                 'credentials.manage',
                 'credentials.reveal',
+                'tickets.view',
+                'tickets.create',
+                'tickets.manage',
+                'tickets.assign',
+                'tickets.cancel',
+                'bus_ticket_cancellations.view',
+                'bus_ticket_cancellations.manage',
                 'audit.view',
             ],
             RoleName::ServiceManager->value => [
@@ -74,6 +88,13 @@ class RolesAndPermissionsSeeder extends Seeder
                 'credentials.view',
                 'credentials.manage',
                 'credentials.reveal',
+                'tickets.view',
+                'tickets.create',
+                'tickets.manage',
+                'tickets.assign',
+                'tickets.cancel',
+                'bus_ticket_cancellations.view',
+                'bus_ticket_cancellations.manage',
                 'audit.view',
             ],
             RoleName::Engineer->value => [
@@ -83,6 +104,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'accounts.view',
                 'accounts.manage',
                 'credentials.view',
+                'tickets.view',
+                'tickets.create',
+                'tickets.manage',
+                'bus_ticket_cancellations.view',
             ],
             RoleName::Technician->value => [
                 'locations.view',
@@ -91,6 +116,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'accounts.view',
                 'accounts.manage',
                 'credentials.view',
+                'tickets.view',
+                'tickets.create',
+                'tickets.manage',
+                'bus_ticket_cancellations.view',
             ],
             RoleName::Auditor->value => [
                 'users.view',
@@ -99,6 +128,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.view',
                 'accounts.view',
                 'credentials.view',
+                'tickets.view',
+                'bus_ticket_cancellations.view',
                 'audit.view',
             ],
             RoleName::ReadOnly->value => [
@@ -108,6 +139,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'assets.view',
                 'accounts.view',
                 'credentials.view',
+                'tickets.view',
+                'bus_ticket_cancellations.view',
             ],
         ];
 

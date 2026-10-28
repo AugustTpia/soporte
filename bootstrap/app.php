@@ -1,5 +1,6 @@
 <?php
 
+use App\Presentation\Http\Middleware\EnsureCompanyFeature;
 use App\Presentation\Http\Middleware\ResolveTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tenant' => ResolveTenant::class,
+            'company.feature' => EnsureCompanyFeature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

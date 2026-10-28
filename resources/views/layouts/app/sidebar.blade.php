@@ -9,6 +9,7 @@
             $activeCompanyId = $tenantContext->companyId();
             $activeCompany = $activeCompanyId ? app(\App\Companies\Domain\Repositories\CompanyRepository::class)->find($activeCompanyId) : null;
             $isSuperAdmin = auth()->user()->isSuperAdmin();
+            $busFeatureEnabled = $activeCompany?->hasFeature(\App\Companies\Domain\Enums\CompanyFeature::BusTicketCancellations) ?? false;
         @endphp
 
         <flux:sidebar sticky collapsible="mobile" class="app-sidebar border-e border-white/10">
@@ -33,8 +34,20 @@
                 @endif
 
                 @if($activeCompanyId !== null)
-                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view') || auth()->user()->can('credentials.view'))
+                    @if(auth()->user()->can('assets.view') || auth()->user()->can('accounts.view') || auth()->user()->can('credentials.view') || auth()->user()->can('tickets.view') || ($busFeatureEnabled && auth()->user()->can('bus_ticket_cancellations.view')))
                         <flux:sidebar.group heading="Operación" class="grid">
+                            @can('viewAny', \App\Support\Infrastructure\Persistence\Eloquent\Models\SupportTicketModel::class)
+                                <flux:sidebar.item icon="ticket" :href="route('tickets.index')" :current="request()->routeIs('tickets.*')" wire:navigate>
+                                    Tickets
+                                </flux:sidebar.item>
+                            @endcan
+                            @if($busFeatureEnabled)
+                                @can('viewAny', \App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Models\BusTicketCancellationModel::class)
+                                    <flux:sidebar.item icon="receipt-refund" :href="route('bus-ticket-cancellations.index')" :current="request()->routeIs('bus-ticket-cancellations.*')" wire:navigate>
+                                        Cancelación de boletos
+                                    </flux:sidebar.item>
+                                @endcan
+                            @endif
                             @can('viewAny', \App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel::class)
                                 <flux:sidebar.item icon="computer-desktop" :href="route('assets.index')" :current="request()->routeIs('assets.*')" wire:navigate>
                                     Activos

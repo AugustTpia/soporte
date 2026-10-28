@@ -6,6 +6,7 @@ use App\Companies\Application\DTOs\CompanyInput;
 use App\Companies\Application\UseCases\ChangeCompanyStatus;
 use App\Companies\Application\UseCases\CreateCompany;
 use App\Companies\Application\UseCases\UpdateCompany;
+use App\Companies\Domain\Enums\CompanyFeature;
 use App\Companies\Domain\Enums\CompanyStatus;
 use App\Companies\Domain\Repositories\CompanyRepository;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
@@ -44,6 +45,8 @@ class CompanyForm extends Component
 
     public string $status = 'active';
 
+    public bool $busTicketCancellations = false;
+
     public function mount(?CompanyModel $company = null): void
     {
         if ($company === null) {
@@ -71,6 +74,7 @@ class CompanyForm extends Component
         $this->timezone = $domain->timezone;
         $this->locale = $domain->locale;
         $this->status = $domain->status->value;
+        $this->busTicketCancellations = $domain->hasFeature(CompanyFeature::BusTicketCancellations);
     }
 
     public function save(): void
@@ -85,7 +89,23 @@ class CompanyForm extends Component
             'industry' => ['nullable', 'string', 'max:120'],
             'timezone' => ['required', 'timezone'],
             'locale' => ['required', 'string', 'max:10'],
+            'busTicketCancellations' => ['boolean'],
         ]);
+
+        $settings = null;
+
+        if ($this->companyId !== null) {
+            $existing = app(CompanyRepository::class)->find($this->companyId);
+
+            if ($existing === null) {
+                abort(404);
+            }
+
+            $settings = $existing->settingsWithFeature(
+                CompanyFeature::BusTicketCancellations,
+                $this->busTicketCancellations,
+            );
+        }
 
         $input = new CompanyInput(
             name: $validated['name'],
@@ -97,6 +117,7 @@ class CompanyForm extends Component
             industry: $this->clean($validated['industry'] ?? null),
             timezone: $validated['timezone'],
             locale: $validated['locale'],
+            settings: $settings,
         );
 
         try {

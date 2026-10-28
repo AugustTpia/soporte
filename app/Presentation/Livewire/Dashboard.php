@@ -10,6 +10,7 @@ use App\Departments\Domain\Repositories\DepartmentRepository;
 use App\Identity\Domain\Enums\UserStatus;
 use App\Identity\Domain\Repositories\UserRepository;
 use App\Shared\Application\Contracts\TenantContext;
+use App\Support\Application\UseCases\CountDashboardTickets;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -37,6 +38,7 @@ class Dashboard extends Component
                 'recentUsers' => [],
                 'recentAudit' => [],
                 'canViewAudit' => false,
+                'ticketStats' => [],
             ]);
         }
 
@@ -57,6 +59,10 @@ class Dashboard extends Component
                 $stats['audit_total'] = $audit->count($companyId);
             }
 
+            $ticketStats = auth()->user()->can('tickets.view')
+                ? app(CountDashboardTickets::class)->execute($companyId, (int) auth()->id())
+                : [];
+
             return view('identity.livewire.dashboard.index', [
                 'company' => $company,
                 'stats' => $stats,
@@ -66,6 +72,7 @@ class Dashboard extends Component
                     ? app(SearchAuditLogs::class)->execute($companyId, null, null, null, null, 1, 5)->items
                     : [],
                 'canViewAudit' => $canViewAudit,
+                'ticketStats' => $ticketStats,
             ]);
         }
 
@@ -85,6 +92,7 @@ class Dashboard extends Component
                 ? app(SearchAuditLogs::class)->execute(null, null, null, null, null, 1, 5)->items
                 : [],
             'canViewAudit' => $canViewAudit,
+            'ticketStats' => [],
         ]);
     }
 }

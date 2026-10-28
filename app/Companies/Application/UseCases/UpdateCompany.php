@@ -33,7 +33,7 @@ final readonly class UpdateCompany
             industry: $input->industry,
             timezone: $input->timezone,
             locale: $input->locale,
-            settings: $input->settings,
+            settings: $input->settings ?? $company->settings,
         );
 
         $saved = $this->companies->save($company);
@@ -67,6 +67,17 @@ final readonly class UpdateCompany
             'timezone' => $company->timezone,
             'locale' => $company->locale,
             'status' => $company->status->value,
+            'features' => $this->features($company),
         ];
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function features(Company $company): array
+    {
+        $features = $company->settings['features'] ?? [];
+
+        return is_array($features) ? $features : [];
     }
 }

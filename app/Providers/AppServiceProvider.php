@@ -8,10 +8,17 @@ use App\Accounts\Infrastructure\Persistence\Eloquent\Repositories\EloquentServic
 use App\Assets\Domain\Repositories\AssetRepository;
 use App\Assets\Infrastructure\Persistence\Eloquent\Models\AssetModel;
 use App\Assets\Infrastructure\Persistence\Eloquent\Repositories\EloquentAssetRepository;
+use App\Attachments\Application\Contracts\EvidenceFileStorage;
+use App\Attachments\Infrastructure\Files\LocalEvidenceFileStorage;
 use App\Auditing\Domain\Repositories\AuditRepository;
 use App\Auditing\Infrastructure\Logging\DatabaseAuditLogger;
 use App\Auditing\Infrastructure\Persistence\Eloquent\Models\AuditLogModel;
 use App\Auditing\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuditRepository;
+use App\BusTicketCancellations\Domain\Repositories\BusTicketCancellationAttachmentRepository;
+use App\BusTicketCancellations\Domain\Repositories\BusTicketCancellationRepository;
+use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Models\BusTicketCancellationModel;
+use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Repositories\EloquentBusTicketCancellationAttachmentRepository;
+use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Repositories\EloquentBusTicketCancellationRepository;
 use App\Companies\Domain\Repositories\CompanyRepository;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
 use App\Companies\Infrastructure\Persistence\Eloquent\Repositories\EloquentCompanyRepository;
@@ -34,11 +41,13 @@ use App\Locations\Infrastructure\Persistence\Eloquent\Models\LocationModel;
 use App\Locations\Infrastructure\Persistence\Eloquent\Repositories\EloquentLocationRepository;
 use App\Policies\AssetPolicy;
 use App\Policies\AuditLogPolicy;
+use App\Policies\BusTicketCancellationPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\CredentialPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\ServiceAccountPolicy;
+use App\Policies\TicketPolicy;
 use App\Policies\UserPolicy;
 use App\Presentation\Http\Middleware\ResolveTenant;
 use App\Shared\Application\Contracts\AuditLogger;
@@ -46,6 +55,11 @@ use App\Shared\Application\Contracts\TenantContext;
 use App\Shared\Application\Contracts\TransactionManager;
 use App\Shared\Infrastructure\Persistence\LaravelTransactionManager;
 use App\Shared\Infrastructure\Tenancy\SessionTenantContext;
+use App\Support\Domain\Repositories\TicketAttachmentRepository;
+use App\Support\Domain\Repositories\TicketRepository;
+use App\Support\Infrastructure\Persistence\Eloquent\Models\SupportTicketModel;
+use App\Support\Infrastructure\Persistence\Eloquent\Repositories\EloquentTicketAttachmentRepository;
+use App\Support\Infrastructure\Persistence\Eloquent\Repositories\EloquentTicketRepository;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -71,6 +85,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransactionManager::class, LaravelTransactionManager::class);
 
         $this->app->bind(ServiceAccountRepository::class, EloquentServiceAccountRepository::class);
+        $this->app->bind(BusTicketCancellationRepository::class, EloquentBusTicketCancellationRepository::class);
+        $this->app->bind(BusTicketCancellationAttachmentRepository::class, EloquentBusTicketCancellationAttachmentRepository::class);
+        $this->app->bind(EvidenceFileStorage::class, LocalEvidenceFileStorage::class);
+        $this->app->bind(TicketRepository::class, EloquentTicketRepository::class);
+        $this->app->bind(TicketAttachmentRepository::class, EloquentTicketAttachmentRepository::class);
         $this->app->bind(CredentialRepository::class, EloquentCredentialRepository::class);
         $this->app->singleton(CredentialCipher::class, fn () => new LaravelCredentialCipher(
             currentKey: config('credentials.current_key'),
@@ -131,6 +150,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LocationModel::class, LocationPolicy::class);
         Gate::policy(AssetModel::class, AssetPolicy::class);
         Gate::policy(ServiceAccountModel::class, ServiceAccountPolicy::class);
+        Gate::policy(SupportTicketModel::class, TicketPolicy::class);
+        Gate::policy(BusTicketCancellationModel::class, BusTicketCancellationPolicy::class);
         Gate::policy(CredentialModel::class, CredentialPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }

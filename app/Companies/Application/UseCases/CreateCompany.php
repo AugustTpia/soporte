@@ -60,6 +60,17 @@ final readonly class CreateCompany
             'phone' => $company->phone,
             'industry' => $company->industry,
             'status' => $company->status->value,
+            'features' => $this->features($company),
         ];
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function features(Company $company): array
+    {
+        $features = $company->settings['features'] ?? [];
+
+        return is_array($features) ? $features : [];
     }
 }

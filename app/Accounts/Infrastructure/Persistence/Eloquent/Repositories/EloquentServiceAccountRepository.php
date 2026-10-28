@@ -76,6 +76,17 @@ final class EloquentServiceAccountRepository implements ServiceAccountRepository
         return $model ? $this->mapper->toDomain($model) : null;
     }
 
+    public function forCompany(int $companyId): array
+    {
+        return ServiceAccountModel::query()
+            ->with(['responsibleUser', 'links.asset'])
+            ->where('company_id', $companyId)
+            ->orderBy('username')
+            ->get()
+            ->map(fn (ServiceAccountModel $model) => $this->mapper->toDomain($model))
+            ->all();
+    }
+
     public function save(ServiceAccount $account): ServiceAccount
     {
         $model = $account->id === null

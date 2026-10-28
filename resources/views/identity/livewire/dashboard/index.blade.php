@@ -92,6 +92,50 @@
             </div>
         </section>
 
+        @if($ticketStats !== [])
+            <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <a href="{{ route('tickets.index', ['scope' => 'unresolved']) }}" class="surface-card p-5 transition hover:border-royal-300 hover:bg-royal-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-royal-50 text-royal-700 dark:bg-royal-600/20 dark:text-royal-300">
+                            <flux:icon.ticket class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $ticketStats['unresolved'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Tickets sin resolver</p>
+                </a>
+
+                <a href="{{ route('tickets.index', ['scope' => 'unassigned']) }}" class="surface-card p-5 transition hover:border-amber-300 hover:bg-amber-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+                            <flux:icon.user-minus class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $ticketStats['unassigned'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Sin asignar</p>
+                </a>
+
+                <a href="{{ route('tickets.index', ['scope' => 'mine']) }}" class="surface-card p-5 transition hover:border-emerald-300 hover:bg-emerald-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                            <flux:icon.user class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $ticketStats['mine'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Asignados a mí</p>
+                </a>
+
+                <a href="{{ route('tickets.index', ['scope' => 'unresolved', 'priority' => 'urgent']) }}" class="surface-card p-5 transition hover:border-rose-300 hover:bg-rose-50/30 dark:hover:bg-zinc-800/60" wire:navigate>
+                    <div class="flex items-start justify-between">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
+                            <flux:icon.exclamation-triangle class="size-5" />
+                        </span>
+                    </div>
+                    <p class="mt-4 text-3xl font-semibold tracking-tight text-navy-900 dark:text-zinc-100">{{ $ticketStats['urgent'] ?? 0 }}</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Urgentes sin resolver</p>
+                </a>
+            </section>
+        @endif
+
         <div class="grid gap-6 {{ $canViewAudit ? 'xl:grid-cols-[1.2fr_1fr]' : '' }}">
             @if($canViewAudit)
                 <section class="surface-card overflow-hidden">
@@ -139,6 +183,19 @@
                     </div>
 
                     <div class="mt-4 grid gap-2">
+                        @can('viewAny', \App\Support\Infrastructure\Persistence\Eloquent\Models\SupportTicketModel::class)
+                            <a href="{{ route('tickets.index') }}" class="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 transition hover:border-royal-300 hover:bg-royal-50/40 dark:hover:bg-zinc-800/60" wire:navigate>
+                                <span class="flex size-9 items-center justify-center rounded-lg bg-royal-50 text-royal-700 dark:bg-royal-600/20 dark:text-royal-300">
+                                    <flux:icon.ticket class="size-4" />
+                                </span>
+                                <span class="flex-1">
+                                    <span class="block text-sm font-medium text-navy-900 dark:text-zinc-100">Tickets</span>
+                                    <span class="block text-xs text-zinc-500 dark:text-zinc-400">Solicitudes de soporte y seguimiento</span>
+                                </span>
+                                <flux:icon.chevron-right class="size-4 text-zinc-400" />
+                            </a>
+                        @endcan
+
                         @can('viewAny', \App\Departments\Infrastructure\Persistence\Eloquent\Models\DepartmentModel::class)
                             <a href="{{ route('departments.index') }}" class="flex items-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 transition hover:border-royal-300 hover:bg-royal-50/40 dark:hover:bg-zinc-800/60" wire:navigate>
                                 <span class="flex size-9 items-center justify-center rounded-lg bg-gold-400/20 text-navy-900 dark:bg-gold-400/10 dark:text-gold-300">

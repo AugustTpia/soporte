@@ -1,5 +1,6 @@
 <?php
 
+use App\BusTicketCancellations\Infrastructure\Persistence\Eloquent\Models\BusTicketCancellationModel;
 use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
 use App\Identity\Domain\Enums\RoleName;
 use App\Identity\Infrastructure\Persistence\Eloquent\User;
@@ -94,4 +95,22 @@ function createTestSuperAdmin(array $attributes = []): User
     $user->assignRole(RoleName::SuperAdmin->value);
 
     return $user;
+}
+
+function enableBusTicketFeature(CompanyModel $company): void
+{
+    $settings = $company->settings ?? [];
+    $settings['features']['bus_ticket_cancellations'] = true;
+    $company->update(['settings' => $settings]);
+    $company->refresh();
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function makeBusCancellationFor(CompanyModel $company, User $operator, array $attributes = []): BusTicketCancellationModel
+{
+    return BusTicketCancellationModel::factory()
+        ->forCompany($company, $operator)
+        ->create($attributes);
 }

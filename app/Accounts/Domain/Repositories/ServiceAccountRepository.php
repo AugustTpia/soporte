@@ -25,6 +25,11 @@ interface ServiceAccountRepository
 
     public function find(int $id, int $companyId): ?ServiceAccount;
 
+    /**
+     * @return array<int, ServiceAccount>
+     */
+    public function forCompany(int $companyId): array;
+
     public function save(ServiceAccount $account): ServiceAccount;
 
     public function identityExists(
