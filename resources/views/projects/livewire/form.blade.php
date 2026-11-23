@@ -33,6 +33,17 @@
                 </p>
             </div>
 
+            @if (!$isEditing && auth()->user()->isSuperAdmin() && $this->companyId === null)
+                <div class="sm:col-span-2">
+                    <flux:select wire:model="selectCompanyId" label="Empresa" required>
+                        <option value="">Selecciona una empresa</option>
+                        @foreach($companyOptions as $company)
+                            <option value="{{ $company['id'] }}">{{ $company['name'] }}</option>
+                        @endforeach
+                    </flux:select>
+                </div>
+            @endif
+
             <div class="grid gap-5 sm:grid-cols-2">
                 <div class="sm:col-span-2">
                     <flux:input

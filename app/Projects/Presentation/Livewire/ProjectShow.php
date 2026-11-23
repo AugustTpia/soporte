@@ -96,16 +96,15 @@ class ProjectShow extends Component
 
         $this->authorize('viewAny', ProjectModel::class);
 
+        $user = auth()->user();
         $this->companyId = app(TenantContext::class)->companyId();
+        $this->canViewAll = $user->isSuperAdmin() || $user->hasRole(RoleName::CompanyAdmin->value);
 
-        if ($this->companyId === null) {
+        if ($this->companyId === null && ! $this->canViewAll) {
             $this->redirectRoute('companies.index', navigate: true);
 
             return;
         }
-
-        $user = auth()->user();
-        $this->canViewAll = $user->isSuperAdmin() || $user->hasRole(RoleName::CompanyAdmin->value);
 
         $project = app(ProjectRepository::class)->findVisible($this->projectId, $this->companyId, (int) $user->id, $this->canViewAll);
 
@@ -113,14 +112,13 @@ class ProjectShow extends Component
             abort(404);
         }
 
-        $model = ProjectModel::query()->where('company_id', $this->companyId)->findOrFail($this->projectId);
-
         $this->canManage = $user->isSuperAdmin() || $user->hasRole(RoleName::CompanyAdmin->value) || $user->id === $project->managerId;
 
-        $company = app(CompanyRepository::class)->find($this->companyId);
+        $company = app(CompanyRepository::class)->find($project->companyId);
         $this->companyName = $company !== null ? $company->name : '';
 
         $this->projectId = $project->id;
+        $this->companyId = $project->companyId;
         $this->name = $project->name;
         $this->description = $project->description;
         $this->status = $project->status->value;

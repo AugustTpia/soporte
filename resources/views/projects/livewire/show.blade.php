@@ -171,81 +171,83 @@
         </div>
     </div>
 
-    <div x-if="taskModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-        <div class="fixed inset-0 bg-black/25" x-show="taskModalOpen" x-transition:enter="transition ease-in duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    @if($taskModalOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="fixed inset-0 bg-black/25"></div>
 
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 w-full max-w-2xl border border-zinc-200 dark:border-zinc-700 shadow-xl" x-show="taskModalOpen" x-transition:enter="transition ease-in duration-150" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-semibold text-navy-900 dark:text-zinc-100">{{ $taskModalId ? 'Editar tarea' : 'Nueva tarea' }}</h2>
-                <flux:button size="sm" variant="ghost" icon="x-mark" wire:click="$set('taskModalOpen', false)" />
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 w-full max-w-2xl border border-zinc-200 dark:border-zinc-700 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-navy-900 dark:text-zinc-100">{{ $taskModalId ? 'Editar tarea' : 'Nueva tarea' }}</h2>
+                    <flux:button size="sm" variant="ghost" icon="x-mark" wire:click="$set('taskModalOpen', false)" />
+                </div>
+
+                <form class="space-y-4">
+                    <div>
+                        <flux:input
+                            wire:model.live="taskModalTitle"
+                            label="Título"
+                            placeholder="Ej. Configurar servidor de respaldo"
+                            maxlength="200"
+                            required
+                            autofocus
+                        />
+                    </div>
+
+                    <div>
+                        <flux:textarea
+                            wire:model.live="taskModalDescription"
+                            label="Descripción"
+                            placeholder="Alcance y pasos de la tarea."
+                            rows="3"
+                        />
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <flux:select wire:model="taskModalStatus" label="Estado" required>
+                            @foreach(\App\Projects\Domain\Enums\ProjectTaskStatus::cases() as $status)
+                                <option value="{{ $status->value }}">{{ $status->label() }}</option>
+                            @endforeach
+                        </flux:select>
+
+                        <flux:select wire:model="taskModalPriority" label="Prioridad" required>
+                            @foreach(\App\Projects\Domain\Enums\ProjectTaskPriority::cases() as $priority)
+                                <option value="{{ $priority->value }}">{{ $priority->label() }}</option>
+                            @endforeach
+                        </flux:select>
+
+                        @if($canManage)
+                            <flux:select wire:model="taskModalAssignedUserId" label="Responsable" required>
+                                <option value="">Selecciona un responsable</option>
+                                @foreach($assignableUsers as $user)
+                                    <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
+                                @endforeach
+                            </flux:select>
+
+                            <flux:select wire:model="taskModalTicketId" label="Ticket vinculado">
+                                <option value="">Sin ticket</option>
+                                @foreach($ticketOptions as $ticket)
+                                    <option value="{{ $ticket['id'] }}">{{ $ticket['label'] }}</option>
+                                @endforeach
+                            </flux:select>
+                        @else
+                            <input type="hidden" wire:model="taskModalAssignedUserId" />
+                            <input type="hidden" wire:model="taskModalTicketId" />
+                        @endif
+
+                        <flux:input wire:model="taskModalDueDate" label="Fecha de vencimiento" type="date" />
+                    </div>
+
+                    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+                        <flux:button variant="ghost" wire:click="$set('taskModalOpen', false)">
+                            Cancelar
+                        </flux:button>
+
+                        <flux:button variant="primary" wire:click.prevent="saveTask">
+                            Guardar tarea
+                        </flux:button>
+                    </div>
+                </form>
             </div>
-
-            <form class="space-y-4">
-                <div>
-                    <flux:input
-                        wire:model.live="taskModalTitle"
-                        label="Título"
-                        placeholder="Ej. Configurar servidor de respaldo"
-                        maxlength="200"
-                        required
-                        autofocus
-                    />
-                </div>
-
-                <div>
-                    <flux:textarea
-                        wire:model.live="taskModalDescription"
-                        label="Descripción"
-                        placeholder="Alcance y pasos de la tarea."
-                        rows="3"
-                    />
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-3">
-                    <flux:select wire:model="taskModalStatus" label="Estado" required>
-                        @foreach(\App\Projects\Domain\Enums\ProjectTaskStatus::cases() as $status)
-                            <option value="{{ $status->value }}">{{ $status->label() }}</option>
-                        @endforeach
-                    </flux:select>
-
-                    <flux:select wire:model="taskModalPriority" label="Prioridad" required>
-                        @foreach(\App\Projects\Domain\Enums\ProjectTaskPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}">{{ $priority->label() }}</option>
-                        @endforeach
-                    </flux:select>
-
-                    @if($canManage)
-                        <flux:select wire:model="taskModalAssignedUserId" label="Responsable" required>
-                            <option value="">Selecciona un responsable</option>
-                            @foreach($assignableUsers as $user)
-                                <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
-                            @endforeach
-                        </flux:select>
-
-                        <flux:select wire:model="taskModalTicketId" label="Ticket vinculado">
-                            <option value="">Sin ticket</option>
-                            @foreach($ticketOptions as $ticket)
-                                <option value="{{ $ticket['id'] }}">{{ $ticket['label'] }}</option>
-                            @endforeach
-                        </flux:select>
-                    @else
-                        <input type="hidden" wire:model="taskModalAssignedUserId" />
-                        <input type="hidden" wire:model="taskModalTicketId" />
-                    @endif
-
-                    <flux:input wire:model="taskModalDueDate" label="Fecha de vencimiento" type="date" />
-                </div>
-
-                <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-                    <flux:button variant="ghost" wire:click="$set('taskModalOpen', false)">
-                        Cancelar
-                    </flux:button>
-
-                    <flux:button variant="primary" wire:click.prevent="saveTask">
-                        Guardar tarea
-                    </flux:button>
-                </div>
-            </form>
         </div>
-    </div>
+    @endif
 </div>

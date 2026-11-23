@@ -17,11 +17,11 @@ final class EloquentProjectRepository implements ProjectRepository
     /**
      * @return Page<Project>
      */
-    public function searchVisible(int $companyId, int $userId, bool $canViewAll, ProjectFilters $filters, int $page = 1, int $perPage = 15): Page
+    public function searchVisible(?int $companyId, int $userId, bool $canViewAll, ProjectFilters $filters, int $page = 1, int $perPage = 15): Page
     {
         $query = ProjectModel::query()
             ->with(['manager', 'creator', 'members.user', 'tasks'])
-            ->where('company_id', $companyId)
+            ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
             ->when(filled($filters->term), function ($query) use ($filters): void {
                 $term = $filters->term;
                 $query->where(function ($query) use ($term): void {
@@ -54,11 +54,11 @@ final class EloquentProjectRepository implements ProjectRepository
         return $model ? $this->mapper->toDomain($model) : null;
     }
 
-    public function findVisible(int $id, int $companyId, int $userId, bool $canViewAll): ?Project
+    public function findVisible(int $id, ?int $companyId, int $userId, bool $canViewAll): ?Project
     {
         $query = ProjectModel::query()
             ->with(['manager', 'creator', 'members.user'])
-            ->where('company_id', $companyId)
+            ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
             ->where('id', $id)
             ->when(! $canViewAll, fn ($q) => $q->whereHas('members', fn ($q) => $q->where('user_id', $userId)));
 

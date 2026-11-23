@@ -3,6 +3,7 @@
 namespace App\Projects\Presentation\Livewire;
 
 use App\Companies\Domain\Repositories\CompanyRepository;
+use App\Companies\Infrastructure\Persistence\Eloquent\Models\CompanyModel;
 use App\Identity\Domain\Enums\RoleName;
 use App\Identity\Domain\Repositories\UserRepository;
 use App\Projects\Application\DTOs\ProjectInput;
@@ -28,6 +29,8 @@ class ProjectForm extends Component
 
     public ?int $companyId = null;
 
+    public ?int $selectCompanyId = null;
+
     public string $companyName = '';
 
     public string $name = '';
@@ -45,6 +48,9 @@ class ProjectForm extends Component
     /** @var array<int, int> */
     public array $memberIds = [];
 
+    /** @var array<int, array{id: int, name: string}> */
+    public array $companyOptions = [];
+
     /** @var array<string, string> */
     public array $statusOptions = [];
 
@@ -53,16 +59,27 @@ class ProjectForm extends Component
 
     public function mount(?ProjectModel $project = null): void
     {
+        $user = auth()->user();
         $this->companyId = app(TenantContext::class)->companyId();
+        $canViewAll = $user->isSuperAdmin() || $user->hasRole(RoleName::CompanyAdmin->value);
 
         if ($this->companyId === null) {
-            $this->redirectRoute('companies.index', navigate: true);
+            if (! $canViewAll) {
+                $this->redirectRoute('companies.index', navigate: true);
 
-            return;
+                return;
+            }
+
+            $this->companyOptions = CompanyModel::query()
+                ->where('status', 'active')
+                ->orderBy('name')
+                ->get()
+                ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])
+                ->all();
+        } else {
+            $company = app(CompanyRepository::class)->find($this->companyId);
+            $this->companyName = $company !== null ? $company->name : '';
         }
-
-        $company = app(CompanyRepository::class)->find($this->companyId);
-        $this->companyName = $company !== null ? $company->name : '';
 
         $this->statusOptions = collect(ProjectStatus::cases())
             ->mapWithKeys(fn (ProjectStatus $status) => [$status->value => $status->label()])
@@ -80,13 +97,17 @@ class ProjectForm extends Component
 
         $this->authorize('update', $project);
 
-        $domain = app(ProjectRepository::class)->findVisible($project->id, $this->companyId, (int) auth()->id(), $this->canViewAll());
+        $effectiveCompanyId = $this->companyId ?? $this->selectCompanyId;
+        $domain = app(ProjectRepository::class)->findVisible($project->id, $effectiveCompanyId, (int) auth()->id(), $canViewAll);
 
         if ($domain === null) {
             abort(404);
         }
 
         $this->projectId = $domain->id;
+        $this->companyId = $domain->companyId;
+        $this->selectCompanyId = $domain->companyId;
+        $this->companyName = '';
         $this->name = $domain->name;
         $this->description = $domain->description ?? '';
         $this->status = $domain->status->value;
@@ -98,9 +119,13 @@ class ProjectForm extends Component
 
     public function save(): void
     {
-        if ($this->companyId === null) {
+        $effectiveCompanyId = $this->companyId ?? $this->selectCompanyId;
+
+        if ($effectiveCompanyId === null) {
             abort(403);
         }
+
+        $this->companyId = $effectiveCompanyId;
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:160'],
@@ -176,28 +201,24 @@ class ProjectForm extends Component
     {
         return view('projects.livewire.form', [
             'isEditing' => $this->projectId !== null,
+            'companyOptions' => $this->companyOptions,
         ]);
     }
 
     private function loadUserOptions(): void
     {
-        if ($this->companyId === null) {
+        $effectiveCompanyId = $this->companyId ?? $this->selectCompanyId;
+
+        if ($effectiveCompanyId === null) {
             return;
         }
 
-        $users = app(UserRepository::class)->forCompany($this->companyId);
+        $users = app(UserRepository::class)->forCompany($effectiveCompanyId);
 
         $this->userOptions = array_map(
             fn ($user) => ['id' => $user->id, 'name' => $user->name],
             array_values(array_filter($users, fn ($user) => $user->isActive())),
         );
-    }
-
-    private function canViewAll(): bool
-    {
-        $user = auth()->user();
-
-        return $user->isSuperAdmin() || $user->hasRole(RoleName::CompanyAdmin->value);
     }
 
     private function clean(?string $value): ?string
