@@ -89,11 +89,11 @@
 
                     <div class="space-y-2">
                         @forelse($column['tasks'] as $task)
-                            <php>
+                            @php
                                 $statusEnum = \App\Projects\Domain\Enums\ProjectTaskStatus::from($task['status']);
                                 $transitions = $statusEnum->allowedTransitions();
                                 $isAssigned = auth()->id() === $task['assigned_user_id'];
-                            </php>
+                            @endphp
                             <div wire:key="project-task-{{ $task['id'] }}" class="rounded-lg border border-zinc-200 p-3 transition hover:bg-royal-50/40 dark:hover:bg-zinc-800/60 dark:border-zinc-700">
                                 <div class="flex items-center justify-between mb-1">
                                     <p class="text-sm font-semibold text-navy-900 dark:text-zinc-100 truncate">{{ $task['title'] }}</p>
@@ -175,7 +175,7 @@
         <div class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="fixed inset-0 bg-black/25"></div>
 
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 w-full max-w-2xl border border-zinc-200 dark:border-zinc-700 shadow-xl">
+            <div class="relative bg-white dark:bg-zinc-900 rounded-2xl p-6 w-full max-w-2xl border border-zinc-200 dark:border-zinc-700 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-sm font-semibold text-navy-900 dark:text-zinc-100">{{ $taskModalId ? 'Editar tarea' : 'Nueva tarea' }}</h2>
                     <flux:button size="sm" variant="ghost" icon="x-mark" wire:click="$set('taskModalOpen', false)" />
