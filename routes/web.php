@@ -4,6 +4,7 @@ use App\Accounts\Presentation\Livewire\ServiceAccountForm;
 use App\Accounts\Presentation\Livewire\ServiceAccountIndex;
 use App\Assets\Presentation\Livewire\AssetForm;
 use App\Assets\Presentation\Livewire\AssetIndex;
+use App\Assistant\Presentation\Http\AssistantChatController;
 use App\Auditing\Presentation\Livewire\AuditIndex;
 use App\BusTicketCancellations\Presentation\Http\Controllers\BusTicketCancellationAttachmentDownloadController;
 use App\BusTicketCancellations\Presentation\Http\Controllers\BusTicketCancellationExportController;
@@ -31,6 +32,7 @@ use App\Maintenance\Presentation\Livewire\MaintenancePlanForm;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanIndex;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanShow;
 use App\Presentation\Livewire\Dashboard;
+use App\Assistant\Presentation\Livewire\AssistantPage;
 use App\Reports\Presentation\Http\Controllers\ReportExportController;
 use App\Reports\Presentation\Livewire\ReportIndex;
 use App\Support\Presentation\Http\Controllers\TicketAttachmentDownloadController;
@@ -47,6 +49,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
+
+    Route::get('assistant', AssistantPage::class)->name('assistant.index');
+    Route::post('assistant/chat', [AssistantChatController::class, 'send'])->name('assistant.chat.send');
 
     Route::get('companies', CompanyIndex::class)->name('companies.index');
     Route::get('companies/create', CompanyForm::class)->name('companies.create');

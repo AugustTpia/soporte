@@ -24,6 +24,10 @@
                         Panel
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="chat-bubble-left-right" :href="route('assistant.index')" :current="request()->routeIs('assistant.*')" wire:navigate>
+                        Asistente
+                    </flux:sidebar.item>
+
                     @if($activeCompany && auth()->user()->can('companies.view'))
                         <flux:sidebar.item
                             icon="building-office-2"
@@ -160,6 +164,16 @@
         </flux:sidebar>
 
         {{ $slot }}
+
+        {{-- El flotante no se muestra en la pagina dedicada del asistente ni en
+             formularios de crear/editar: ahi los botones Cancelar (abajo a la
+             izquierda) y Crear/Guardar (abajo a la derecha) ocupan las dos
+             esquinas inferiores, asi que cualquier flotante taparia uno de
+             ellos. En esas paginas el asistente sigue disponible por la
+             entrada "Asistente" del menu, que abre la pagina dedicada. --}}
+        @if(! request()->routeIs("assistant.*", "*.create", "*.edit"))
+            @include('assistant.assistant-chat', ['embedded' => false])
+        @endif
 
         @persist('toast')
             <flux:toast.group>
