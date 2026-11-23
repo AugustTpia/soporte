@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        @if($isEditing)
+        @if($isEditing || auth()->user()?->isSuperAdmin())
             <div class="surface-card p-5 sm:p-6">
                 <div class="flex items-start gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4">
                     <span class="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
@@ -106,12 +106,22 @@
                     </div>
                 </div>
 
-                <div class="mt-5">
-                    <flux:switch
-                        wire:model="busTicketCancellations"
-                        label="Cancelación de boletos de autobús"
-                        description="Registra y reporta cancelaciones realizadas manualmente, sin modificar sistemas externos."
-                    />
+                <div class="mt-5 space-y-5">
+                    @if(auth()->user()?->isSuperAdmin())
+                        <flux:switch
+                            wire:model="assistantEnabled"
+                            label="Asistente IA"
+                            description="Asistente de soporte con IA (Gemini) para esta empresa. Si se desactiva, el asistente no aparece ni responde para sus usuarios."
+                        />
+                    @endif
+
+                    @if($isEditing)
+                        <flux:switch
+                            wire:model="busTicketCancellations"
+                            label="Cancelación de boletos de autobús"
+                            description="Registra y reporta cancelaciones realizadas manualmente, sin modificar sistemas externos."
+                        />
+                    @endif
                 </div>
             </div>
         @endif

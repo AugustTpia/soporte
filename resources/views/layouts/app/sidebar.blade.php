@@ -10,6 +10,7 @@
             $activeCompany = $activeCompanyId ? app(\App\Companies\Domain\Repositories\CompanyRepository::class)->find($activeCompanyId) : null;
             $isSuperAdmin = auth()->user()->isSuperAdmin();
             $busFeatureEnabled = $activeCompany?->hasFeature(\App\Companies\Domain\Enums\CompanyFeature::BusTicketCancellations) ?? false;
+            $assistantEnabled = $activeCompany === null ? true : $activeCompany->assistantEnabled();
         @endphp
 
         <flux:sidebar sticky collapsible="mobile" class="app-sidebar border-e border-white/10">
@@ -24,9 +25,11 @@
                         Panel
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="chat-bubble-left-right" :href="route('assistant.index')" :current="request()->routeIs('assistant.*')" wire:navigate>
-                        Asistente
-                    </flux:sidebar.item>
+                    @if($assistantEnabled)
+                        <flux:sidebar.item icon="chat-bubble-left-right" :href="route('assistant.index')" :current="request()->routeIs('assistant.*')" wire:navigate>
+                            Asistente
+                        </flux:sidebar.item>
+                    @endif
 
                     @if($activeCompany && auth()->user()->can('companies.view'))
                         <flux:sidebar.item
@@ -188,7 +191,7 @@
              esquinas inferiores, asi que cualquier flotante taparia uno de
              ellos. En esas paginas el asistente sigue disponible por la
              entrada "Asistente" del menu, que abre la pagina dedicada. --}}
-        @if(! request()->routeIs("assistant.*", "*.create", "*.edit"))
+        @if($assistantEnabled && ! request()->routeIs("assistant.*", "*.create", "*.edit"))
             @include('assistant.assistant-chat', ['embedded' => false])
         @endif
 

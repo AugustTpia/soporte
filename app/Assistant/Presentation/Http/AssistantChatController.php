@@ -2,6 +2,7 @@
 
 namespace App\Assistant\Presentation\Http;
 
+use App\Assistant\AssistantAvailability;
 use App\Assistant\AssistantChatState;
 use App\Assistant\GeminiAssistantService;
 use Illuminate\Http\JsonResponse;
@@ -13,11 +14,25 @@ use Illuminate\Http\Request;
  * El texto de la pregunta viene en el cuerpo de la petición, no en el
  * snapshot de un componente Livewire: así un segundo envío no puede
  * perderse por una sincronización desactualizada del input.
+ *
+ * Si el asistente está desactivado para la empresa activa, no se llama
+ * a Gemini ni se guarda la pregunta: se devuelve un mensaje amable.
  */
 final class AssistantChatController
 {
     public function send(Request $request): JsonResponse
     {
+        $availability = app(AssistantAvailability::class);
+
+        if (! $availability->enabled()) {
+            return response()->json([
+                'reply' => $availability->disabledMessage(),
+                'messages' => AssistantChatState::load()['messages'],
+                'open' => false,
+                'disabled' => true,
+            ]);
+        }
+
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:1000'],
         ]);

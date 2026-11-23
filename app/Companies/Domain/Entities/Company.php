@@ -117,6 +117,21 @@ final class Company
     }
 
     /**
+     * El asistente IA está activado para esta empresa.
+     *
+     * Por defecto activado: las empresas creadas antes del interruptor
+     * (o sin el ajuste guardado) conservan el asistente. Solo se
+     * desactiva cuando el superadmin lo apaga explícitamente en la
+     * ficha de la empresa (features.assistant = false).
+     */
+    public function assistantEnabled(): bool
+    {
+        $features = $this->settings['features'] ?? [];
+
+        return is_array($features) ? (bool) ($features[CompanyFeature::Assistant->value] ?? true) : true;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function settingsWithFeature(CompanyFeature $feature, bool $enabled): array

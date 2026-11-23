@@ -47,6 +47,8 @@ class CompanyForm extends Component
 
     public bool $busTicketCancellations = false;
 
+    public bool $assistantEnabled = true;
+
     public function mount(?CompanyModel $company = null): void
     {
         if ($company === null) {
@@ -75,6 +77,7 @@ class CompanyForm extends Component
         $this->locale = $domain->locale;
         $this->status = $domain->status->value;
         $this->busTicketCancellations = $domain->hasFeature(CompanyFeature::BusTicketCancellations);
+        $this->assistantEnabled = $domain->assistantEnabled();
     }
 
     public function save(): void
@@ -90,6 +93,7 @@ class CompanyForm extends Component
             'timezone' => ['required', 'timezone'],
             'locale' => ['required', 'string', 'max:10'],
             'busTicketCancellations' => ['boolean'],
+            'assistantEnabled' => ['boolean'],
         ]);
 
         $settings = null;
@@ -105,6 +109,13 @@ class CompanyForm extends Component
                 CompanyFeature::BusTicketCancellations,
                 $this->busTicketCancellations,
             );
+            $settings['features'][CompanyFeature::Assistant->value] = $this->assistantEnabled;
+        } else {
+            // Al crear, el asistente queda activado por defecto.
+            $settings = ['features' => [
+                CompanyFeature::BusTicketCancellations->value => $this->busTicketCancellations,
+                CompanyFeature::Assistant->value => $this->assistantEnabled,
+            ]];
         }
 
         $input = new CompanyInput(
