@@ -51,6 +51,23 @@
                                 <flux:sidebar.item icon="ticket" :href="route('tickets.index')" :current="request()->routeIs('tickets.*')" wire:navigate>
                                     Tickets
                                 </flux:sidebar.item>
+
+                                @php
+                                    $tenant = app(\App\Shared\Application\Contracts\TenantContext::class);
+                                    $sidebarUser = auth()->user();
+                                    $sidebarHasProjects = false;
+
+                                    if ($tenant->companyId() !== null) {
+                                        $sidebarCanViewAll = $sidebarUser->isSuperAdmin() || $sidebarUser->hasRole(\App\Identity\Domain\Enums\RoleName::CompanyAdmin->value);
+                                        $sidebarHasProjects = app(\App\Projects\Domain\Repositories\ProjectRepository::class)->hasAnyVisible($tenant->companyId(), $sidebarUser->id, $sidebarCanViewAll);
+                                    }
+                                @endphp
+
+                                @if($sidebarHasProjects && $sidebarUser->can('projects.view'))
+                                    <flux:sidebar.item icon="layout-grid" :href="route('projects.index')" :current="request()->routeIs('projects.*')" wire:navigate>
+                                        Proyectos
+                                    </flux:sidebar.item>
+                                @endif
                             @endcan
                             @can('viewAny', \App\Maintenance\Infrastructure\Persistence\Eloquent\Models\MaintenancePlanModel::class)
                                 <flux:sidebar.item icon="wrench-screwdriver" :href="route('maintenance.index')" :current="request()->routeIs('maintenance.*')" wire:navigate>

@@ -31,6 +31,9 @@ use App\Maintenance\Presentation\Livewire\MaintenancePlanForm;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanIndex;
 use App\Maintenance\Presentation\Livewire\MaintenancePlanShow;
 use App\Presentation\Livewire\Dashboard;
+use App\Projects\Presentation\Livewire\ProjectForm;
+use App\Projects\Presentation\Livewire\ProjectIndex;
+use App\Projects\Presentation\Livewire\ProjectShow;
 use App\Reports\Presentation\Http\Controllers\ReportExportController;
 use App\Reports\Presentation\Livewire\ReportIndex;
 use App\Support\Presentation\Http\Controllers\TicketAttachmentDownloadController;
@@ -73,6 +76,11 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('tickets/create', TicketForm::class)->name('tickets.create');
     Route::get('tickets/{ticket}', TicketShow::class)->name('tickets.show');
     Route::get('tickets/{ticket}/edit', TicketForm::class)->name('tickets.edit');
+
+    Route::get('projects', ProjectIndex::class)->name('projects.index');
+    Route::get('projects/create', ProjectForm::class)->name('projects.create');
+    Route::get('projects/{project}', ProjectShow::class)->name('projects.show');
+    Route::get('projects/{project}/edit', ProjectForm::class)->name('projects.edit');
     Route::get('tickets/{ticket}/attachments/{attachment}/download', TicketAttachmentDownloadController::class)
         ->whereNumber('attachment')
         ->name('tickets.attachments.download');

@@ -60,10 +60,18 @@ use App\Policies\DepartmentPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\MaintenanceExecutionPolicy;
 use App\Policies\MaintenancePlanPolicy;
+use App\Policies\ProjectPolicy;
+use App\Policies\ProjectTaskPolicy;
 use App\Policies\ServiceAccountPolicy;
 use App\Policies\TicketPolicy;
 use App\Policies\UserPolicy;
 use App\Presentation\Http\Middleware\ResolveTenant;
+use App\Projects\Domain\Repositories\ProjectRepository;
+use App\Projects\Domain\Repositories\ProjectTaskRepository;
+use App\Projects\Infrastructure\Persistence\Eloquent\Models\ProjectModel;
+use App\Projects\Infrastructure\Persistence\Eloquent\Models\ProjectTaskModel;
+use App\Projects\Infrastructure\Persistence\Eloquent\Repositories\EloquentProjectRepository;
+use App\Projects\Infrastructure\Persistence\Eloquent\Repositories\EloquentProjectTaskRepository;
 use App\Reports\Application\Contracts\CancellationReportQuery;
 use App\Reports\Application\Contracts\CsvReportExporter;
 use App\Reports\Application\Contracts\MaintenanceReportQuery;
@@ -117,6 +125,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MaintenancePlanRepository::class, EloquentMaintenancePlanRepository::class);
         $this->app->bind(MaintenanceExecutionRepository::class, EloquentMaintenanceExecutionRepository::class);
         $this->app->bind(MaintenanceExecutionAttachmentRepository::class, EloquentMaintenanceExecutionAttachmentRepository::class);
+        $this->app->bind(ProjectRepository::class, EloquentProjectRepository::class);
+        $this->app->bind(ProjectTaskRepository::class, EloquentProjectTaskRepository::class);
         $this->app->bind(CredentialRepository::class, EloquentCredentialRepository::class);
         $this->app->singleton(CredentialCipher::class, fn () => new LaravelCredentialCipher(
             currentKey: config('credentials.current_key'),
@@ -188,6 +198,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(BusTicketCancellationModel::class, BusTicketCancellationPolicy::class);
         Gate::policy(MaintenancePlanModel::class, MaintenancePlanPolicy::class);
         Gate::policy(MaintenanceExecutionModel::class, MaintenanceExecutionPolicy::class);
+        Gate::policy(ProjectModel::class, ProjectPolicy::class);
+        Gate::policy(ProjectTaskModel::class, ProjectTaskPolicy::class);
         Gate::policy(CredentialModel::class, CredentialPolicy::class);
         Gate::policy(AuditLogModel::class, AuditLogPolicy::class);
     }
